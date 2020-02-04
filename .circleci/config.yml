@@ -1,37 +1,45 @@
 version: 2.1
+
+executors:
+  python-executor:
+    docker:
+      - image: circleci/python:3.8
+aliases:
+  - &ola:
+    run: say ola
+    command:  |
+      echo 'Ola!'
 orbs:
   slack: circleci/slack@3.4.2
 jobs:
-  build:
-    docker:
-      - image: circleci/python:3.8
     steps:
       - run:
           name: The First Step
           command: |
             echo 'Hello World!'
             echo 'This is the delivery pipeline'
+      - *ola
   test:
-    docker:
-      - image: circleci/python:3.8
+    executor: python-executor
     steps:
       - run:
           name: The First Step
           command: |
             echo 'Hello World!'
             echo 'This is the delivery pipeline'
+      - *ola
       - slack/notify:
           color: '#42e2f4'
           message: This is a custom message notification
           webhook: https://hooks.slack.com/services/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
   staging_deploy:
-    docker:
-      - image: circleci/python:3.8
+    executor: python-executor
     steps:
       - deploy:
           name: Staging Deployment
           command: |
             echo 'DEPLOYING STAG!!!'
+      - *ola
 workflows:
   simple_workflow:
     jobs:
