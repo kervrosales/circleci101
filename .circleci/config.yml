@@ -4,16 +4,19 @@ executors:
   python-executor:
     docker:
       - image: circleci/python:3.8
+
 aliases:
   - &ola
-    run: 
-    name: say ola
-    command:  |
-      echo 'Ola!'
+    run:
+      name: say ola
+      command: |
+        echo "Ola!"
 orbs:
   slack: circleci/slack@3.4.2
+
 jobs:
   build:
+    executor: python-executor
     steps:
       - run:
           name: The First Step
@@ -29,7 +32,6 @@ jobs:
           command: |
             echo 'Hello World!'
             echo 'This is the delivery pipeline'
-      - *ola
       - slack/notify:
           color: '#42e2f4'
           message: This is a custom message notification
@@ -41,13 +43,15 @@ jobs:
           name: Staging Deployment
           command: |
             echo 'DEPLOYING STAG!!!'
-      - *ola
+
 workflows:
   simple_workflow:
     jobs:
       - build
       - test
       - slack/approval-notification:
+          requires:
+            - build
           message: Pending approval
           webhook: https://hooks.slack.com/services/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
       - wait_for_approve:
