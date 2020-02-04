@@ -5,7 +5,7 @@ executors:
     docker:
       - image: circleci/python:3.8
 aliases:
-  - &ola:
+  - &ola
     run: 
     name: say ola
     command:  |
