@@ -35,7 +35,7 @@ jobs:
       - slack/notify:
           color: '#42e2f4'
           message: This is a custom message notification
-          webhook: https://hooks.slack.com/services/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
+          webhook: ${SLACK_WEBHOOK}
   staging_deploy:
     executor: python-executor
     steps:
@@ -53,7 +53,7 @@ workflows:
           requires:
             - build
           message: Pending approval
-          webhook: https://hooks.slack.com/services/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
+          webhook: ${SLACK_WEBHOOK}
           type: approval
           requires:
             - build
