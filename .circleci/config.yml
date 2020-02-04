@@ -21,7 +21,6 @@ jobs:
             echo 'Hello World!'
             echo 'This is the delivery pipeline'
       - slack/notify:
-          channel: CHANNELID
           color: '#42e2f4'
           message: This is a custom message notification
           webhook: https://hooks.slack.com/services/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
