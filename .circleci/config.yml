@@ -54,6 +54,7 @@ workflows:
             - build
           message: Pending approval
           webhook: ${SLACK_WEBHOOK}
+      - wait_for_approve:
           type: approval
           requires:
             - build
