@@ -35,6 +35,6 @@ workflows:
           type: approval
           requires:
             - build
-      - deploy:
+      - staging_deploy:
           requires:
             - wait_for_approve
