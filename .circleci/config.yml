@@ -6,7 +6,8 @@ executors:
       - image: circleci/python:3.8
 aliases:
   - &ola:
-    run: say ola
+    run: 
+    name: say ola
     command:  |
       echo 'Ola!'
 orbs:
