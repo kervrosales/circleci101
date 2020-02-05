@@ -4,7 +4,6 @@ executors:
   python-executor:
     docker:
       - image: circleci/python:3.8
-
 aliases:
   - &ola
     run:
@@ -13,19 +12,16 @@ aliases:
         echo "Ola!"
 orbs:
   slack: circleci/slack@3.4.2
+  runner: testimio/runner@1.1.1
 
 jobs:
-  build:
-    executor: python-executor
-    steps:
-      - run:
-          name: The First Step
-          command: |
-            echo 'Hello World!'
-            echo 'This is the delivery pipeline'
-      - *ola
-  test:
-    executor: python-executor
+  build-and-test:
+    jobs:
+      - testimio/run_tests:
+        token: ${TESTIM_TOKEN}
+        project_id: ${TESTIMPROJECT_ID}
+        grid_name: 'Testim-Grid'
+        options: '--test-plan "Regression:Navigation"'
     steps:
       - run:
           name: The First Step
