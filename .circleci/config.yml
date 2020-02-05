@@ -12,16 +12,11 @@ aliases:
         echo "Ola!"
 orbs:
   slack: circleci/slack@3.4.2
-  runner: testimio/runner@1.1.1
+  testimio: testimio/runner@1.1.0
 
 jobs:
-  build-and-test:
-    jobs:
-      - testimio/run_tests:
-        token: ${TESTIM_TOKEN}
-        project_id: ${TESTIMPROJECT_ID}
-        grid_name: 'Testim-Grid'
-        options: '--test-plan "Regression:Navigation"'
+  build:
+    executor: python-executor
     steps:
       - run:
           name: The First Step
@@ -44,7 +39,12 @@ workflows:
   simple_workflow:
     jobs:
       - build
-      - test
+      - staging_deploy
+      - testimio/run_tests:
+          token: ${TESTIM_TOKEN}
+          project_id: ${TESTIMPROJECT_ID}
+          grid_name: 'Testim-Grid'
+          options: '--test-plan "Regression:Navigation"'
       - slack/approval-notification:
           requires:
             - build
