@@ -30,11 +30,12 @@ jobs:
             fi
       - slack/notify:
           color: '#42e2f4'
-          title: Deployed By Kervin Rosales
+          title: Deployment Complete
           title_link: 'Commit ID: 123123123'
           ts: $(date +%s)
-          message: This is a custom message notification
-          footer: React Version Updated
+          message: |
+          " This is unquoted text\n>This is quoted text\n>This is still quoted text\nThis is unquoted text again"
+          footer: 
           webhook: ${SLACK_WEBHOOK}
   staging_deploy:
     executor: python-executor
