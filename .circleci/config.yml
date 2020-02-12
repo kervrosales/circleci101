@@ -30,7 +30,11 @@ jobs:
             fi
       - slack/notify:
           color: '#42e2f4'
+          title: Deployed By Kervin Rosales
+          title_link: 'Commit ID: 123123123'
+          ts: $(date +%s)
           message: This is a custom message notification
+          footer: React Version Updated
           webhook: ${SLACK_WEBHOOK}
   staging_deploy:
     executor: python-executor
@@ -49,44 +53,20 @@ workflows:
           token: ${TESTIM_TOKEN}
           project_id: ${TESTIMPROJECT_ID}
           grid_name: 'Testim-Grid'
-          options: '--test-plan "Regression:AP" --test-plan "Regression:Receive"  
-          --test-plan "Regression:LocationsAndUsers"'
+          options:  |
+            ' --test-plan "Regression:AP" --test-plan "Regression:ApprovalRouting" --test-plan "Regression:Finance" \
+            --test-plan "Regression:Request" --test-plan "Regression:Approval" --test-plan "Regression:LocationsAndUsers" \
+            --test-plan "Regression:Procure" --test-plan "Regression:Receive" --test-plan "Regression:Navigation" \
+            --base-url https://release.procurify.com'
           filters:
             branches:
-              only: #skip for now
-                -/^release$/
+              only:
+                - beta
+
       - slack/approval-notification:
           requires:
             - build
-          message: 
-            '"attachments": [
-                {
-                    "fallback": "test",
-                    "color": "#0098a6",
-                    "title": "$1",
-                    "title_link": ".",
-                    "text": "",
-                    "mrkdwn_in": ["fields"],
-                    "fields": [
-                        {
-                            "title": "Git Author",
-                            "value": "test",
-                            "short": true
-                        },
-                        {
-                            "title": "Git Commit",
-                            "value": ".",
-                            "short": true
-                        },
-                        {
-                            "title": "Deployer",
-                            "value": "to",
-                            "short": true
-                        }
-                    ],
-                    "ts": tod
-                }
-              ]'
+          message: Waiting Approval                    
           webhook: ${SLACK_WEBHOOK_CIRCLE}
       - wait_for_approve:
           type: approval

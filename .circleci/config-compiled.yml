@@ -54,10 +54,10 @@ jobs:
                     \"text\": \"This is a custom message notification $SLACK_MENTIONS\", \
                     \"author_name\": \"\", \
                     \"author_link\": \"\", \
-                    \"title\": \"\", \
-                    \"title_link\": \"\", \
-                    \"footer\": \"\", \
-                    \"ts\": \"\", \
+                    \"title\": \"Deployed By Kervin Rosales\", \
+                    \"title_link\": \"Commit ID: 123123123\", \
+                    \"footer\": \"React Version Updated\", \
+                    \"ts\": \"$(date +%s)\", \
                     \"fields\": [ \
                       { \
                         \"title\": \"Project\", \
@@ -101,7 +101,11 @@ jobs:
         name: run tests
         command: |
           mkdir -p /tmp/circleci-test-results
-          OPTIONS='--test-plan "Regression:AP" --test-plan "Regression:Receive" --test-plan "Regression:LocationsAndUsers"'
+          OPTIONS='' --test-plan "Regression:AP" --test-plan "Regression:ApprovalRouting" --test-plan "Regression:Finance" \
+          --test-plan "Regression:Request" --test-plan "Regression:Approval" --test-plan "Regression:LocationsAndUsers" \
+          --test-plan "Regression:Procure" --test-plan "Regression:Receive" --test-plan "Regression:Navigation" \
+          --base-url https://release.procurify.com'
+          '
           if [[ -z ${OPTIONS} ]]; then
             testim --project "${TESTIMPROJECT_ID}" \
               --grid "Testim-Grid" \
@@ -112,7 +116,11 @@ jobs:
               --grid "Testim-Grid" \
               --token "${TESTIM_TOKEN}" \
               --report-file /tmp/circleci-test-results/report.xml \
-              --test-plan "Regression:AP" --test-plan "Regression:Receive" --test-plan "Regression:LocationsAndUsers"
+              ' --test-plan "Regression:AP" --test-plan "Regression:ApprovalRouting" --test-plan "Regression:Finance" \
+          --test-plan "Regression:Request" --test-plan "Regression:Approval" --test-plan "Regression:LocationsAndUsers" \
+          --test-plan "Regression:Procure" --test-plan "Regression:Receive" --test-plan "Regression:Navigation" \
+          --base-url https://release.procurify.com'
+
           fi
     - store_artifacts:
         path: /tmp/circleci-test-results
@@ -159,8 +167,8 @@ jobs:
               "{ \
                 \"attachments\": [ \
                   { \
-                    \"fallback\": \""attachments": [ { "fallback": "test", "color": "#0098a6", "title": "$1", "title_link": ".", "text": "", "mrkdwn_in": ["fields"], "fields": [ { "title": "Git Author", "value": "test", "short": true }, { "title": "Git Commit", "value": ".", "short": true }, { "title": "Deployer", "value": "to", "short": true } ], "ts": tod } ] - https://circleci.com/workflow-run/${CIRCLE_WORKFLOW_ID}\", \
-                    \"text\": \""attachments": [ { "fallback": "test", "color": "#0098a6", "title": "$1", "title_link": ".", "text": "", "mrkdwn_in": ["fields"], "fields": [ { "title": "Git Author", "value": "test", "short": true }, { "title": "Git Commit", "value": ".", "short": true }, { "title": "Deployer", "value": "to", "short": true } ], "ts": tod } ] $SLACK_MENTIONS\", \
+                    \"fallback\": \"Waiting Approval - https://circleci.com/workflow-run/${CIRCLE_WORKFLOW_ID}\", \
+                    \"text\": \"Waiting Approval $SLACK_MENTIONS\", \
                     \"fields\": [ \
                       { \
                         \"title\": \"Project\", \
@@ -204,7 +212,8 @@ workflows:
     - testimio/run_tests:
         filters:
           branches:
-            only: -/^release$/
+            only:
+            - beta
     - slack/approval-notification:
         requires:
         - build
@@ -250,7 +259,11 @@ workflows:
 #             fi
 #       - slack/notify:
 #           color: '#42e2f4'
+#           title: Deployed By Kervin Rosales
+#           title_link: 'Commit ID: 123123123'
+#           ts: $(date +%s)
 #           message: This is a custom message notification
+#           footer: React Version Updated
 #           webhook: ${SLACK_WEBHOOK}
 #   staging_deploy:
 #     executor: python-executor
@@ -269,44 +282,20 @@ workflows:
 #           token: ${TESTIM_TOKEN}
 #           project_id: ${TESTIMPROJECT_ID}
 #           grid_name: 'Testim-Grid'
-#           options: '--test-plan \"Regression:AP\" --test-plan \"Regression:Receive\"  
-#           --test-plan \"Regression:LocationsAndUsers\"'
+#           options:  |
+#             ' --test-plan \"Regression:AP\" --test-plan \"Regression:ApprovalRouting\" --test-plan \"Regression:Finance\" \\
+#             --test-plan \"Regression:Request\" --test-plan \"Regression:Approval\" --test-plan \"Regression:LocationsAndUsers\" \\
+#             --test-plan \"Regression:Procure\" --test-plan \"Regression:Receive\" --test-plan \"Regression:Navigation\" \\
+#             --base-url https://release.procurify.com'
 #           filters:
 #             branches:
-#               only: #skip for now
-#                 -/^release$/
+#               only:
+#                 - beta
+# 
 #       - slack/approval-notification:
 #           requires:
 #             - build
-#           message: 
-#             '\"attachments\": [
-#                 {
-#                     \"fallback\": \"test\",
-#                     \"color\": \"#0098a6\",
-#                     \"title\": \"$1\",
-#                     \"title_link\": \".\",
-#                     \"text\": \"\",
-#                     \"mrkdwn_in\": [\"fields\"],
-#                     \"fields\": [
-#                         {
-#                             \"title\": \"Git Author\",
-#                             \"value\": \"test\",
-#                             \"short\": true
-#                         },
-#                         {
-#                             \"title\": \"Git Commit\",
-#                             \"value\": \".\",
-#                             \"short\": true
-#                         },
-#                         {
-#                             \"title\": \"Deployer\",
-#                             \"value\": \"to\",
-#                             \"short\": true
-#                         }
-#                     ],
-#                     \"ts\": tod
-#                 }
-#               ]'
+#           message: Waiting Approval                    
 #           webhook: ${SLACK_WEBHOOK_CIRCLE}
 #       - wait_for_approve:
 #           type: approval
