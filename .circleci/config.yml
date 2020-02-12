@@ -10,6 +10,7 @@ aliases:
       name: say ola
       command: |
         echo "Ola!a"
+
 orbs:
   slack: circleci/slack@3.4.2
   testimio: testimio/runner@1.1.0
@@ -50,10 +51,42 @@ workflows:
           grid_name: 'Testim-Grid'
           options: '--test-plan "Regression:AP" --test-plan "Regression:Receive"  
           --test-plan "Regression:LocationsAndUsers"'
+          filters:
+            branches:
+              only: #skip for now
+                -/^release$/
       - slack/approval-notification:
           requires:
             - build
-          message: Pending approval
+          message: 
+            '"attachments": [
+                {
+                    "fallback": "test",
+                    "color": "#0098a6",
+                    "title": "$1",
+                    "title_link": ".",
+                    "text": "",
+                    "mrkdwn_in": ["fields"],
+                    "fields": [
+                        {
+                            "title": "Git Author",
+                            "value": "test",
+                            "short": true
+                        },
+                        {
+                            "title": "Git Commit",
+                            "value": ".",
+                            "short": true
+                        },
+                        {
+                            "title": "Deployer",
+                            "value": "to",
+                            "short": true
+                        }
+                    ],
+                    "ts": tod
+                }
+              ]'
           webhook: ${SLACK_WEBHOOK_CIRCLE}
       - wait_for_approve:
           type: approval
