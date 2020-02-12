@@ -22,6 +22,7 @@ jobs:
           name: The First Step
           command: |
             if [${CIRCLE_BRANCH} == "master"];
+            then
               echo 'Hello World!'8
             else
               echo 'This is the delivery pipeline'
