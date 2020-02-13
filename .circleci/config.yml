@@ -1,5 +1,15 @@
 version: 2.1
 
+parameters:
+  git-author:
+    type: string
+    default: $(git config user.name)
+  timestamp:
+    type: string
+    default: $(date +%s)
+  
+  
+
 executors:
   python-executor:
     docker:
@@ -28,15 +38,16 @@ jobs:
             else
               echo 'This is the delivery pipeline'
             fi
+            GIT_AUTHOR=$(git log --format='%aN' ${CIRCLE_SHA1}^!)
       - slack/notify:
           color: '#42e2f4'
           title: Starting Deployment 
           title_link: 'Commit ID: 123123123'
           include_project_field: false
-          ts: $(date +%s)
+          ts:  <<pipeline.parameters.timestamp>>
           message:
-            "\n> *Git Author*: Kervin Rosales \n>*Deployer*: \
-            $(git config user.name) \n> *Git Commit* ${CIRCLE_SHA1}:\n>"
+            "\n> *Git Author*: ${GIT_AUTHOR}\n>*Deployer*: <<pipeline.parameters.git-author>>\
+             \n> *Git Commit* ${CIRCLE_SHA1}:\n>"
           webhook: ${SLACK_WEBHOOK}
   staging_deploy:
     executor: python-executor
