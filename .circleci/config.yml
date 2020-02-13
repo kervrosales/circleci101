@@ -30,12 +30,12 @@ jobs:
             fi
       - slack/notify:
           color: '#42e2f4'
-          title: Deployment Complete
+          title: Starting Deployment 
           title_link: 'Commit ID: 123123123'
           ts: $(date +%s)
           message:
             "\n> *Git Author*: Kervin Rosales \n>*Deployer*: \
-            $(git config user.name) \n>*Git Commit*${CIRCLE_SHA1}: *unquoted text*\n>\
+            $(git config user.name) \n> *Git Commit* ${CIRCLE_SHA1}:*\n>\
             This is quoted text\n>This is still quoted text\nThis is unquoted text again"
           footer: 
           webhook: ${SLACK_WEBHOOK}
