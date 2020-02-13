@@ -53,7 +53,8 @@ jobs:
           include_project_field: false
           ts:  <<pipeline.parameters.timestamp>>
           message:
-            "*Commit ID* :${CIRCLE_SHA1}"
+            "*Commit ID* :\n
+            <https://github.com/procurify/procurifydevelopment/commits/${CIRCLE_SHA1}|${CIRCLE_SHA1}>"
           webhook: ${SLACK_WEBHOOK}
   staging_deploy:
     executor: python-executor

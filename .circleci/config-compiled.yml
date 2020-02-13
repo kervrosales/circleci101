@@ -52,11 +52,13 @@ jobs:
               "{ \
                 \"attachments\": [ \
                   { \
-                    \"fallback\": \"Hello - $CIRCLE_BUILD_URL\", \
-                    \"text\": \"Hello $SLACK_MENTIONS\", \
+                    \"fallback\": \"*Commit ID* :
+           <https://github.com/procurify/procurifydevelopment/commits/${CIRCLE_SHA1}|${CIRCLE_SHA1}> - $CIRCLE_BUILD_URL\", \
+                    \"text\": \"*Commit ID* :
+           <https://github.com/procurify/procurifydevelopment/commits/${CIRCLE_SHA1}|${CIRCLE_SHA1}> $SLACK_MENTIONS\", \
                     \"author_name\": \"\", \
                     \"author_link\": \"\", \
-                    \"title\": \"Deploying `${CIRCLE_SHA1}`\", \
+                    \"title\": \"Deployment Started\", \
                     \"title_link\": \"https://github.com/procurify/procurifydevelopment/commits/${CIRCLE_SHA1}\", \
                     \"footer\": \"\", \
                     \"ts\": \"$(date +%s)\", \
@@ -267,12 +269,13 @@ workflows:
 #             git log --format='%aN' ${CIRCLE_SHA1}^!
 #       - slack/notify:
 #           color: '#0098a6'
-#           title: \"Deploying `${CIRCLE_SHA1}`\"
+#           title: \"Deployment Started\"
 #           title_link: https://github.com/procurify/procurifydevelopment/commits/${CIRCLE_SHA1}
 #           include_project_field: false
 #           ts:  <<pipeline.parameters.timestamp>>
 #           message:
-#             \"Hello\"
+#             \"*Commit ID* :\\n
+#             <https://github.com/procurify/procurifydevelopment/commits/${CIRCLE_SHA1}|${CIRCLE_SHA1}>\"
 #           webhook: ${SLACK_WEBHOOK}
 #   staging_deploy:
 #     executor: python-executor
