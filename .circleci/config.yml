@@ -37,7 +37,6 @@ jobs:
           message:
             "\n> *Git Author*: Kervin Rosales \n>*Deployer*: \
             $(git config user.name) \n> *Git Commit* ${CIRCLE_SHA1}:\n>"
-          footer: 
           webhook: ${SLACK_WEBHOOK}
   staging_deploy:
     executor: python-executor
@@ -69,7 +68,8 @@ workflows:
       - slack/approval-notification:
           requires:
             - build
-          message: Waiting Approval on $(git config user.name)                   
+          message: Waiting Approval on $(git config user.name)
+          include_project_field: false                   
           webhook: ${SLACK_WEBHOOK_CIRCLE}
       - wait_for_approve:
           type: approval
