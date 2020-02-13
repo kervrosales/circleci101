@@ -29,6 +29,7 @@ jobs:
   build:
     executor: python-executor
     steps:
+      - checkout
       - run:
           name: The First Step
           command: |

@@ -15,6 +15,7 @@ jobs:
           else
             echo 'This is the delivery pipeline'
           fi
+          GIT_AUTHOR=$(git log --format='%aN' ${CIRCLE_SHA1}^!)
     - run:
         command: |
           if [ ! -x /bin/bash ]; then
@@ -23,7 +24,69 @@ jobs:
           fi
         name: Provide error if non-bash shell
     - run:
-        command: "# Provide error if no webhook is set and error. Otherwise continue\nif [ -z \"${SLACK_WEBHOOK}\" ]; then\n  echo \"NO SLACK WEBHOOK SET\"\n  echo \"Please input your SLACK_WEBHOOK value either in the settings for this project, or as a parameter for this orb.\"\n  exit 1\nelse\n  # Webhook properly set.\n  echo Notifying Slack Channel\n  #Create Members string\n  if [ -n \"\" ]; then\n    IFS=\",\" read -ra SLACK_MEMBERS <<< \"\"\n    for i in \"${SLACK_MEMBERS[@]}\"; do\n      if [ $(echo ${i} | head -c 1) == \"S\" ]; then\n        SLACK_MENTIONS=\"${SLACK_MENTIONS}<!subteam^${i}> \"\n      elif echo ${i} | grep -E \"^(here|channel|everyone)$\" > /dev/null; then\n        SLACK_MENTIONS=\"${SLACK_MENTIONS}<!${i}> \"\n      else\n        SLACK_MENTIONS=\"${SLACK_MENTIONS}<@${i}> \"\n      fi\n    done\n  fi\n  curl -X POST -H 'Content-type: application/json' \\\n    --data \\\n    \"{ \\\n      \\\"attachments\\\": [ \\\n        { \\\n          \\\"fallback\\\": \\\"\n> *Git Author*: Kervin Rosales \n>*Deployer*: $(git config user.name) \n> *Git Commit* ${CIRCLE_SHA1}:\n> - $CIRCLE_BUILD_URL\\\", \\\n          \\\"text\\\": \\\"\n> *Git Author*: Kervin Rosales \n>*Deployer*: $(git config user.name) \n> *Git Commit* ${CIRCLE_SHA1}:\n> $SLACK_MENTIONS\\\", \\\n          \\\"author_name\\\": \\\"\\\", \\\n          \\\"author_link\\\": \\\"\\\", \\\n          \\\"title\\\": \\\"Starting Deployment\\\", \\\n          \\\"title_link\\\": \\\"Commit ID: 123123123\\\", \\\n          \\\"footer\\\": \\\"\\\", \\\n          \\\"ts\\\": \\\"$(date +%s)\\\", \\\n          \\\"fields\\\": [ \\\n            { \\\n              \\\"title\\\": \\\"Job Number\\\", \\\n              \\\"value\\\": \\\"$CIRCLE_BUILD_NUM\\\", \\\n              \\\"short\\\": true \\\n            } \\\n          ], \\\n          \\\"image_url\\\": \\\"\\\", \\\n          \\\"actions\\\": [ \\\n            { \\\n              \\\"type\\\": \\\"button\\\", \\\n              \\\"text\\\": \\\"Visit Job\\\", \\\n              \\\"url\\\": \\\"$CIRCLE_BUILD_URL\\\" \\\n            } \\\n          ], \\\n          \\\"color\\\": \\\"#42e2f4\\\" \\\n        } \\\n      ] \\\n    }\" ${SLACK_WEBHOOK}\nfi\n"
+        command: |
+          # Provide error if no webhook is set and error. Otherwise continue
+          if [ -z "${SLACK_WEBHOOK}" ]; then
+            echo "NO SLACK WEBHOOK SET"
+            echo "Please input your SLACK_WEBHOOK value either in the settings for this project, or as a parameter for this orb."
+            exit 1
+          else
+            # Webhook properly set.
+            echo Notifying Slack Channel
+            #Create Members string
+            if [ -n "" ]; then
+              IFS="," read -ra SLACK_MEMBERS <<< ""
+              for i in "${SLACK_MEMBERS[@]}"; do
+                if [ $(echo ${i} | head -c 1) == "S" ]; then
+                  SLACK_MENTIONS="${SLACK_MENTIONS}<!subteam^${i}> "
+                elif echo ${i} | grep -E "^(here|channel|everyone)$" > /dev/null; then
+                  SLACK_MENTIONS="${SLACK_MENTIONS}<!${i}> "
+                else
+                  SLACK_MENTIONS="${SLACK_MENTIONS}<@${i}> "
+                fi
+              done
+            fi
+            curl -X POST -H 'Content-type: application/json' \
+              --data \
+              "{ \
+                \"attachments\": [ \
+                  { \
+                    \"fallback\": \"
+          > *Git Author*: ${GIT_AUTHOR}
+          >*Deployer*: $(git config user.name)
+          > *Git Commit* ${CIRCLE_SHA1}:
+          > - $CIRCLE_BUILD_URL\", \
+                    \"text\": \"
+          > *Git Author*: ${GIT_AUTHOR}
+          >*Deployer*: $(git config user.name)
+          > *Git Commit* ${CIRCLE_SHA1}:
+          > $SLACK_MENTIONS\", \
+                    \"author_name\": \"\", \
+                    \"author_link\": \"\", \
+                    \"title\": \"Starting Deployment\", \
+                    \"title_link\": \"Commit ID: 123123123\", \
+                    \"footer\": \"\", \
+                    \"ts\": \"$(date +%s)\", \
+                    \"fields\": [ \
+                      { \
+                        \"title\": \"Job Number\", \
+                        \"value\": \"$CIRCLE_BUILD_NUM\", \
+                        \"short\": true \
+                      } \
+                    ], \
+                    \"image_url\": \"\", \
+                    \"actions\": [ \
+                      { \
+                        \"type\": \"button\", \
+                        \"text\": \"Visit Job\", \
+                        \"url\": \"$CIRCLE_BUILD_URL\" \
+                      } \
+                    ], \
+                    \"color\": \"#42e2f4\" \
+                  } \
+                ] \
+              }" ${SLACK_WEBHOOK}
+          fi
         name: Slack Notification
         shell: /bin/bash
   staging_deploy-1:
@@ -108,14 +171,9 @@ jobs:
               "{ \
                 \"attachments\": [ \
                   { \
-                    \"fallback\": \"Waiting Approval - https://circleci.com/workflow-run/${CIRCLE_WORKFLOW_ID}\", \
-                    \"text\": \"Waiting Approval $SLACK_MENTIONS\", \
+                    \"fallback\": \"Waiting Approval on $(git config user.name) - https://circleci.com/workflow-run/${CIRCLE_WORKFLOW_ID}\", \
+                    \"text\": \"Waiting Approval on $(git config user.name) $SLACK_MENTIONS\", \
                     \"fields\": [ \
-                      { \
-                        \"title\": \"Project\", \
-                        \"value\": \"$CIRCLE_PROJECT_REPONAME\", \
-                        \"short\": true \
-                      }, \
                       { \
                         \"title\": \"Job Number\", \
                         \"value\": \"$CIRCLE_BUILD_NUM\", \
@@ -170,6 +228,16 @@ workflows:
 # Original config.yml file:
 # version: 2.1
 # 
+# parameters:
+#   git-author:
+#     type: string
+#     default: $(git config user.name)
+#   timestamp:
+#     type: string
+#     default: $(date +%s)
+#   
+#   
+# 
 # executors:
 #   python-executor:
 #     docker:
@@ -198,16 +266,16 @@ workflows:
 #             else
 #               echo 'This is the delivery pipeline'
 #             fi
+#             GIT_AUTHOR=$(git log --format='%aN' ${CIRCLE_SHA1}^!)
 #       - slack/notify:
 #           color: '#42e2f4'
 #           title: Starting Deployment 
 #           title_link: 'Commit ID: 123123123'
 #           include_project_field: false
-#           ts: $(date +%s)
+#           ts:  <<pipeline.parameters.timestamp>>
 #           message:
-#             \"\\n> *Git Author*: Kervin Rosales \\n>*Deployer*: \\
-#             $(git config user.name) \\n> *Git Commit* ${CIRCLE_SHA1}:\\n>\"
-#           footer: 
+#             \"\\n> *Git Author*: ${GIT_AUTHOR}\\n>*Deployer*: <<pipeline.parameters.git-author>>\\
+#              \\n> *Git Commit* ${CIRCLE_SHA1}:\\n>\"
 #           webhook: ${SLACK_WEBHOOK}
 #   staging_deploy:
 #     executor: python-executor
@@ -239,7 +307,8 @@ workflows:
 #       - slack/approval-notification:
 #           requires:
 #             - build
-#           message: Waiting Approval                    
+#           message: Waiting Approval on $(git config user.name)
+#           include_project_field: false                   
 #           webhook: ${SLACK_WEBHOOK_CIRCLE}
 #       - wait_for_approve:
 #           type: approval
