@@ -25,61 +25,7 @@ jobs:
           fi
         name: Provide error if non-bash shell
     - run:
-        command: |
-          # Provide error if no webhook is set and error. Otherwise continue
-          if [ -z "${SLACK_WEBHOOK}" ]; then
-            echo "NO SLACK WEBHOOK SET"
-            echo "Please input your SLACK_WEBHOOK value either in the settings for this project, or as a parameter for this orb."
-            exit 1
-          else
-            # Webhook properly set.
-            echo Notifying Slack Channel
-            #Create Members string
-            if [ -n "" ]; then
-              IFS="," read -ra SLACK_MEMBERS <<< ""
-              for i in "${SLACK_MEMBERS[@]}"; do
-                if [ $(echo ${i} | head -c 1) == "S" ]; then
-                  SLACK_MENTIONS="${SLACK_MENTIONS}<!subteam^${i}> "
-                elif echo ${i} | grep -E "^(here|channel|everyone)$" > /dev/null; then
-                  SLACK_MENTIONS="${SLACK_MENTIONS}<!${i}> "
-                else
-                  SLACK_MENTIONS="${SLACK_MENTIONS}<@${i}> "
-                fi
-              done
-            fi
-            curl -X POST -H 'Content-type: application/json' \
-              --data \
-              "{ \
-                \"attachments\": [ \
-                  { \
-                    \"fallback\": \"*Production Deployment*: commit ${CIRCLE_SHA1} by $(git log --format='%aN)) - $CIRCLE_BUILD_URL\", \
-                    \"text\": \"*Production Deployment*: commit ${CIRCLE_SHA1} by $(git log --format='%aN)) $SLACK_MENTIONS\", \
-                    \"author_name\": \"$(git config user.name)\", \
-                    \"author_link\": \"https://github.com/procurify/procurifydevelopment/commits/${CIRCLE_SHA1}\", \
-                    \"title\": \"Starting Deployment\", \
-                    \"title_link\": \"Commit ID: 123123123\", \
-                    \"footer\": \"\", \
-                    \"ts\": \"$(date +%s)\", \
-                    \"fields\": [ \
-                      { \
-                        \"title\": \"Job Number\", \
-                        \"value\": \"$CIRCLE_BUILD_NUM\", \
-                        \"short\": true \
-                      } \
-                    ], \
-                    \"image_url\": \"\", \
-                    \"actions\": [ \
-                      { \
-                        \"type\": \"button\", \
-                        \"text\": \"Visit Job\", \
-                        \"url\": \"$CIRCLE_BUILD_URL\" \
-                      } \
-                    ], \
-                    \"color\": \"#42e2f4\" \
-                  } \
-                ] \
-              }" ${SLACK_WEBHOOK}
-          fi
+        command: "# Provide error if no webhook is set and error. Otherwise continue\nif [ -z \"${SLACK_WEBHOOK}\" ]; then\n  echo \"NO SLACK WEBHOOK SET\"\n  echo \"Please input your SLACK_WEBHOOK value either in the settings for this project, or as a parameter for this orb.\"\n  exit 1\nelse\n  # Webhook properly set.\n  echo Notifying Slack Channel\n  #Create Members string\n  if [ -n \"\" ]; then\n    IFS=\",\" read -ra SLACK_MEMBERS <<< \"\"\n    for i in \"${SLACK_MEMBERS[@]}\"; do\n      if [ $(echo ${i} | head -c 1) == \"S\" ]; then\n        SLACK_MENTIONS=\"${SLACK_MENTIONS}<!subteam^${i}> \"\n      elif echo ${i} | grep -E \"^(here|channel|everyone)$\" > /dev/null; then\n        SLACK_MENTIONS=\"${SLACK_MENTIONS}<!${i}> \"\n      else\n        SLACK_MENTIONS=\"${SLACK_MENTIONS}<@${i}> \"\n      fi\n    done\n  fi\n  curl -X POST -H 'Content-type: application/json' \\\n    --data \\\n    \"{ \\\n      \\\"attachments\\\": [ \\\n        { \\\n          \\\"fallback\\\": \\\"*Production Deployment*: \ncommit ${CIRCLE_SHA1} by $(git config user.name) - $CIRCLE_BUILD_URL\\\", \\\n          \\\"text\\\": \\\"*Production Deployment*: \ncommit ${CIRCLE_SHA1} by $(git config user.name) $SLACK_MENTIONS\\\", \\\n          \\\"author_name\\\": \\\"$(git log --format='%aN' ${CIRCLE_SHA1}^!)\\\", \\\n          \\\"author_link\\\": \\\"https://github.com/procurify/procurifydevelopment/commits/${CIRCLE_SHA1}\\\", \\\n          \\\"title\\\": \\\"Starting Deployment\\\", \\\n          \\\"title_link\\\": \\\"\\\", \\\n          \\\"footer\\\": \\\"\\\", \\\n          \\\"ts\\\": \\\"$(date +%s)\\\", \\\n          \\\"fields\\\": [ \\\n            { \\\n              \\\"title\\\": \\\"Job Number\\\", \\\n              \\\"value\\\": \\\"$CIRCLE_BUILD_NUM\\\", \\\n              \\\"short\\\": true \\\n            } \\\n          ], \\\n          \\\"image_url\\\": \\\"\\\", \\\n          \\\"actions\\\": [ \\\n            { \\\n              \\\"type\\\": \\\"button\\\", \\\n              \\\"text\\\": \\\"Visit Job\\\", \\\n              \\\"url\\\": \\\"$CIRCLE_BUILD_URL\\\" \\\n            } \\\n          ], \\\n          \\\"color\\\": \\\"#42e2f4\\\" \\\n        } \\\n      ] \\\n    }\" ${SLACK_WEBHOOK}\nfi\n"
         name: Slack Notification
         shell: /bin/bash
   staging_deploy-1:
@@ -98,8 +44,7 @@ jobs:
         name: run tests
         command: |
           mkdir -p /tmp/circleci-test-results
-          OPTIONS='' "Regression:Navigation" \
-          --base-url https://automation1.procurify.com'
+          OPTIONS='' "Regression:Navigation"'
           '
           if [[ -z ${OPTIONS} ]]; then
             testim --project "${TESTIMPROJECT_ID}" \
@@ -111,8 +56,7 @@ jobs:
               --grid "Testim-Grid" \
               --token "${TESTIM_TOKEN}" \
               --report-file /tmp/circleci-test-results/report.xml \
-              ' "Regression:Navigation" \
-          --base-url https://automation1.procurify.com'
+              ' "Regression:Navigation"'
 
           fi
     - store_artifacts:
@@ -262,13 +206,12 @@ workflows:
 #       - slack/notify:
 #           color: '#42e2f4'
 #           title: Starting Deployment 
-#           title_link: 'Commit ID: 123123123'
-#           author_name: $(git config user.name)
-#           author_link: <<pipeline.parameters.commit-link>>/${CIRCLE_SHA1}
+#           author_name: $(git log --format='%aN' ${CIRCLE_SHA1}^!)
+#           author_link: \"https://github.com/procurify/procurifydevelopment/commits/${CIRCLE_SHA1}\"
 #           include_project_field: false
 #           ts:  <<pipeline.parameters.timestamp>>
 #           message:
-#             \"*Production Deployment*: commit ${CIRCLE_SHA1} by $(git log --format='%aN))\"
+#             \"*Production Deployment*: \\ncommit ${CIRCLE_SHA1} by $(git config user.name)\"
 #           webhook: ${SLACK_WEBHOOK}
 #   staging_deploy:
 #     executor: python-executor
@@ -288,8 +231,7 @@ workflows:
 #           project_id: ${TESTIMPROJECT_ID}
 #           grid_name: 'Testim-Grid'
 #           options:  |
-#             ' \"Regression:Navigation\" \\
-#             --base-url https://automation1.procurify.com'
+#             ' \"Regression:Navigation\"'
 # 
 #       - slack/approval-notification:
 #           requires:

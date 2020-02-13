@@ -50,7 +50,7 @@ jobs:
           color: '#42e2f4'
           title: Starting Deployment 
           author_name: $(git log --format='%aN' ${CIRCLE_SHA1}^!)
-          author_link: "https://github.com/procurify/procurifydevelopment/commits"/${CIRCLE_SHA1}
+          author_link: "https://github.com/procurify/procurifydevelopment/commits/${CIRCLE_SHA1}"
           include_project_field: false
           ts:  <<pipeline.parameters.timestamp>>
           message:
