@@ -47,14 +47,14 @@ jobs:
             fi
             git log --format='%aN' ${CIRCLE_SHA1}^!
       - slack/notify:
-          color: '#42e2f4'
+          color: '#0098a6'
           title: Starting Deployment 
-          author_name: $(git log --format='%aN' ${CIRCLE_SHA1}^!)
+          author_name: "Author: \n $(git log --format='%aN' ${CIRCLE_SHA1}^!)"
           author_link: "https://github.com/procurify/procurifydevelopment/commits/${CIRCLE_SHA1}"
           include_project_field: false
           ts:  <<pipeline.parameters.timestamp>>
           message:
-            "*Production Deployment*: \ncommit ${CIRCLE_SHA1} by $(git config user.name)"
+            "Commit ID: \n ${CIRCLE_SHA1}"
           webhook: ${SLACK_WEBHOOK}
   staging_deploy:
     executor: python-executor
