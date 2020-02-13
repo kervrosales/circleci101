@@ -32,11 +32,11 @@ jobs:
           color: '#42e2f4'
           title: Starting Deployment 
           title_link: 'Commit ID: 123123123'
+          include_project_field: false
           ts: $(date +%s)
           message:
             "\n> *Git Author*: Kervin Rosales \n>*Deployer*: \
-            $(git config user.name) \n> *Git Commit* ${CIRCLE_SHA1}:*\n>\
-            This is quoted text\n>This is still quoted text\nThis is unquoted text again"
+            $(git config user.name) \n> *Git Commit* ${CIRCLE_SHA1}:\n>"
           footer: 
           webhook: ${SLACK_WEBHOOK}
   staging_deploy:
@@ -69,7 +69,7 @@ workflows:
       - slack/approval-notification:
           requires:
             - build
-          message: Waiting Approval                    
+          message: Waiting Approval on $(git config user.name)                   
           webhook: ${SLACK_WEBHOOK_CIRCLE}
       - wait_for_approve:
           type: approval
