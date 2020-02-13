@@ -69,12 +69,8 @@ workflows:
             ' --test-plan "Regression:AP" --test-plan "Regression:ApprovalRouting" --test-plan "Regression:Finance" \
             --test-plan "Regression:Request" --test-plan "Regression:Approval" --test-plan "Regression:LocationsAndUsers" \
             --test-plan "Regression:Procure" --test-plan "Regression:Receive" --test-plan "Regression:Navigation" \
-            --base-url https://release.procurify.com'
-          filters:
-            branches:
-              only:
-                - beta
-
+            --base-url https://automation1.procurify.com'
+            
       - slack/approval-notification:
           requires:
             - build
