@@ -1,9 +1,6 @@
 version: 2.1
 
 parameters:
-  git-author:
-    type: string
-    default: $(git config user.name)
   timestamp:
     type: string
     default: $(date +%s)
@@ -48,7 +45,7 @@ jobs:
           include_project_field: false
           ts:  <<pipeline.parameters.timestamp>>
           message:
-            "\n> *Git Author*: ${GIT_AUTHOR}\n>*Deployer*: <<pipeline.parameters.git-author>>\
+            "\n> *Git Author*: $(git log --format='%aN' ${CIRCLE_SHA1}^!)\n>*Deployer*: $(git config user.name)\
              \n> *Git Commit* ${CIRCLE_SHA1}:\n>"
           webhook: ${SLACK_WEBHOOK}
   staging_deploy:
