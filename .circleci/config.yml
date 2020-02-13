@@ -4,6 +4,15 @@ parameters:
   timestamp:
     type: string
     default: $(date +%s)
+  git-author:
+    type: string
+    default: $(git log --format='%aN' ${CIRCLE_SHA1}^!)
+  deployer:
+    type: string
+    default: $(git config user.name)
+  commit-link:
+    type: string
+    default: "https://github.com/procurify/procurifydevelopment/commits"
   
   
 
@@ -37,16 +46,16 @@ jobs:
               echo 'This is the delivery pipeline'
             fi
             git log --format='%aN' ${CIRCLE_SHA1}^!
-            GIT_AUTHOR=$(git log --format='%aN' ${CIRCLE_SHA1}^!)
       - slack/notify:
           color: '#42e2f4'
           title: Starting Deployment 
           title_link: 'Commit ID: 123123123'
+          author_name: <<pipeline.parameters.git-author>>
+          author_link: <<pipeline.parameters.commit-link>>/${CIRCLE_SHA1}
           include_project_field: false
           ts:  <<pipeline.parameters.timestamp>>
           message:
-            "\n> *Git Author*: $(git log --format='%aN' ${CIRCLE_SHA1}^!)\n>*Deployer*: $(git config user.name)\
-             \n> *Git Commit* ${CIRCLE_SHA1}:\n>"
+            "*Production Deployment*: commit ${CIRCLE_SHA1} by <<pipeline.parameters.deployer>>))"
           webhook: ${SLACK_WEBHOOK}
   staging_deploy:
     executor: python-executor
@@ -66,11 +75,8 @@ workflows:
           project_id: ${TESTIMPROJECT_ID}
           grid_name: 'Testim-Grid'
           options:  |
-            ' --test-plan "Regression:AP" --test-plan "Regression:ApprovalRouting" --test-plan "Regression:Finance" \
-            --test-plan "Regression:Request" --test-plan "Regression:Approval" --test-plan "Regression:LocationsAndUsers" \
-            --test-plan "Regression:Procure" --test-plan "Regression:Receive" --test-plan "Regression:Navigation" \
-            --base-url https://automation1.procurify.com'
-            
+            ' "Regression:Navigation"'
+
       - slack/approval-notification:
           requires:
             - build
