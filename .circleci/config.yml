@@ -48,7 +48,7 @@ jobs:
             git log --format='%aN' ${CIRCLE_SHA1}^!
       - slack/notify:
           color: '#0098a6'
-          title: Deploying ${CIRCLE_SHA1} 
+          title: "Deploying `${CIRCLE_SHA1}`"
           title_link: https://github.com/procurify/procurifydevelopment/commits/${CIRCLE_SHA1}
           include_project_field: false
           ts:  <<pipeline.parameters.timestamp>>
