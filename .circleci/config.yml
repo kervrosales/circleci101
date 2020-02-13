@@ -39,6 +39,7 @@ jobs:
             else
               echo 'This is the delivery pipeline'
             fi
+            git log --format='%aN' ${CIRCLE_SHA1}^!
             GIT_AUTHOR=$(git log --format='%aN' ${CIRCLE_SHA1}^!)
       - slack/notify:
           color: '#42e2f4'
