@@ -86,7 +86,7 @@ workflows:
             - build
           message: Waiting Approval on $(git log --format='%aN' ${CIRCLE_SHA1}^!)
           include_project_field: false                   
-          webhook: ${SLACK_WEBHOOK_CIRCLE}
+          webhook: ${SLACK_WEBHOOK}
       - wait_for_approve:
           type: approval
           requires:
