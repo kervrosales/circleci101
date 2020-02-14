@@ -55,7 +55,7 @@ jobs:
           message:
             "*Commit ID* :\n
             <https://github.com/procurify/procurifydevelopment/commits/${CIRCLE_SHA1}|${CIRCLE_SHA1}> \n
-            *By*: $(git log --format='%aN' ${CIRCLE_SHA1}^!)"
+            *By*:\n ${CIRCLE_USERNAME}"
 
           webhook: ${SLACK_WEBHOOK}
   staging_deploy:
@@ -84,7 +84,7 @@ workflows:
       - slack/approval-notification:
           requires:
             - build
-          message: Waiting Approval on $(git log --format='%aN' ${CIRCLE_SHA1}^!)
+          message: Waiting Approval on ${CIRCLE_USERNAME}
           include_project_field: false                   
           webhook: ${SLACK_WEBHOOK}
       - wait_for_approve:
