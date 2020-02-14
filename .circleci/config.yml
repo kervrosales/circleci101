@@ -55,7 +55,7 @@ jobs:
           message:
             "*Commit ID* :\n
             <https://github.com/procurify/procurifydevelopment/commits/${CIRCLE_SHA1}|${CIRCLE_SHA1}> \n
-            *By*: $(git config user.name)"
+            *By*: git log --format='%aN' ${CIRCLE_SHA1}^!"
 
           webhook: ${SLACK_WEBHOOK}
   staging_deploy:
