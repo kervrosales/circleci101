@@ -85,7 +85,7 @@ workflows:
           requires:
             - build
           color: '#0098a6'
-          message: "Deployment Waiting Approval On: / n
+          message: "*Deployment Waiting Approval On*: /n
               ${CIRCLE_USERNAME}
              *Commit ID* :\n
             <https://github.com/procurify/procurifydevelopment/commits/${CIRCLE_SHA1}|${CIRCLE_SHA1}> \n
