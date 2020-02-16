@@ -84,8 +84,8 @@ workflows:
       - slack/approval-notification:
           requires:
             - build
-          message: "*This Deployment requires approval of*: \n
-              ${CIRCLE_USERNAME}
+          message: "*This Deployment is waiting for approval from*: \n
+              ${CIRCLE_USERNAME}\n
              *Commit ID* :\n
             <https://github.com/procurify/procurifydevelopment/commits/${CIRCLE_SHA1}|${CIRCLE_SHA1}> \n
               "
