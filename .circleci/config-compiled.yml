@@ -25,7 +25,7 @@ jobs:
           fi
         name: Provide error if non-bash shell
     - run:
-        command: "# Provide error if no webhook is set and error. Otherwise continue\nif [ -z \"${SLACK_WEBHOOK}\" ]; then\n  echo \"NO SLACK WEBHOOK SET\"\n  echo \"Please input your SLACK_WEBHOOK value either in the settings for this project, or as a parameter for this orb.\"\n  exit 1\nelse\n  # Webhook properly set.\n  echo Notifying Slack Channel\n  #Create Members string\n  if [ -n \"\" ]; then\n    IFS=\",\" read -ra SLACK_MEMBERS <<< \"\"\n    for i in \"${SLACK_MEMBERS[@]}\"; do\n      if [ $(echo ${i} | head -c 1) == \"S\" ]; then\n        SLACK_MENTIONS=\"${SLACK_MENTIONS}<!subteam^${i}> \"\n      elif echo ${i} | grep -E \"^(here|channel|everyone)$\" > /dev/null; then\n        SLACK_MENTIONS=\"${SLACK_MENTIONS}<!${i}> \"\n      else\n        SLACK_MENTIONS=\"${SLACK_MENTIONS}<@${i}> \"\n      fi\n    done\n  fi\n  curl -X POST -H 'Content-type: application/json' \\\n    --data \\\n    \"{ \\\n      \\\"attachments\\\": [ \\\n        { \\\n          \\\"fallback\\\": \\\"*Commit ID* :\n <https://github.com/procurify/procurifydevelopment/commits/${CIRCLE_SHA1}|${CIRCLE_SHA1}> \n *By*: $(git config user.name) - $CIRCLE_BUILD_URL\\\", \\\n          \\\"text\\\": \\\"*Commit ID* :\n <https://github.com/procurify/procurifydevelopment/commits/${CIRCLE_SHA1}|${CIRCLE_SHA1}> \n *By*: $(git config user.name) $SLACK_MENTIONS\\\", \\\n          \\\"author_name\\\": \\\"\\\", \\\n          \\\"author_link\\\": \\\"\\\", \\\n          \\\"title\\\": \\\"Deployment Started\\\", \\\n          \\\"title_link\\\": \\\"https://github.com/procurify/procurifydevelopment/commits/${CIRCLE_SHA1}\\\", \\\n          \\\"footer\\\": \\\"\\\", \\\n          \\\"ts\\\": \\\"$(date +%s)\\\", \\\n          \\\"fields\\\": [ \\\n            { \\\n              \\\"title\\\": \\\"Job Number\\\", \\\n              \\\"value\\\": \\\"$CIRCLE_BUILD_NUM\\\", \\\n              \\\"short\\\": true \\\n            } \\\n          ], \\\n          \\\"image_url\\\": \\\"\\\", \\\n          \\\"actions\\\": [ \\\n            { \\\n              \\\"type\\\": \\\"button\\\", \\\n              \\\"text\\\": \\\"Visit Job\\\", \\\n              \\\"url\\\": \\\"$CIRCLE_BUILD_URL\\\" \\\n            } \\\n          ], \\\n          \\\"color\\\": \\\"#0098a6\\\" \\\n        } \\\n      ] \\\n    }\" ${SLACK_WEBHOOK}\nfi\n"
+        command: "# Provide error if no webhook is set and error. Otherwise continue\nif [ -z \"${SLACK_WEBHOOK}\" ]; then\n  echo \"NO SLACK WEBHOOK SET\"\n  echo \"Please input your SLACK_WEBHOOK value either in the settings for this project, or as a parameter for this orb.\"\n  exit 1\nelse\n  # Webhook properly set.\n  echo Notifying Slack Channel\n  #Create Members string\n  if [ -n \"\" ]; then\n    IFS=\",\" read -ra SLACK_MEMBERS <<< \"\"\n    for i in \"${SLACK_MEMBERS[@]}\"; do\n      if [ $(echo ${i} | head -c 1) == \"S\" ]; then\n        SLACK_MENTIONS=\"${SLACK_MENTIONS}<!subteam^${i}> \"\n      elif echo ${i} | grep -E \"^(here|channel|everyone)$\" > /dev/null; then\n        SLACK_MENTIONS=\"${SLACK_MENTIONS}<!${i}> \"\n      else\n        SLACK_MENTIONS=\"${SLACK_MENTIONS}<@${i}> \"\n      fi\n    done\n  fi\n  curl -X POST -H 'Content-type: application/json' \\\n    --data \\\n    \"{ \\\n      \\\"attachments\\\": [ \\\n        { \\\n          \\\"fallback\\\": \\\"*Commit ID* :\n <https://github.com/procurify/procurifydevelopment/commits/${CIRCLE_SHA1}|${CIRCLE_SHA1}> \n *By*:\n ${CIRCLE_USERNAME} - $CIRCLE_BUILD_URL\\\", \\\n          \\\"text\\\": \\\"*Commit ID* :\n <https://github.com/procurify/procurifydevelopment/commits/${CIRCLE_SHA1}|${CIRCLE_SHA1}> \n *By*:\n ${CIRCLE_USERNAME} $SLACK_MENTIONS\\\", \\\n          \\\"author_name\\\": \\\"\\\", \\\n          \\\"author_link\\\": \\\"\\\", \\\n          \\\"title\\\": \\\"Deployment Started\\\", \\\n          \\\"title_link\\\": \\\"https://github.com/procurify/procurifydevelopment/commits/${CIRCLE_SHA1}\\\", \\\n          \\\"footer\\\": \\\"\\\", \\\n          \\\"ts\\\": \\\"$(date +%s)\\\", \\\n          \\\"fields\\\": [ \\\n            { \\\n              \\\"title\\\": \\\"Job Number\\\", \\\n              \\\"value\\\": \\\"$CIRCLE_BUILD_NUM\\\", \\\n              \\\"short\\\": true \\\n            } \\\n          ], \\\n          \\\"image_url\\\": \\\"\\\", \\\n          \\\"actions\\\": [ \\\n            { \\\n              \\\"type\\\": \\\"button\\\", \\\n              \\\"text\\\": \\\"Visit Job\\\", \\\n              \\\"url\\\": \\\"$CIRCLE_BUILD_URL\\\" \\\n            } \\\n          ], \\\n          \\\"color\\\": \\\"#0098a6\\\" \\\n        } \\\n      ] \\\n    }\" ${SLACK_WEBHOOK}\nfi\n"
         name: Slack Notification
         shell: /bin/bash
   staging_deploy-1:
@@ -86,54 +86,7 @@ jobs:
           fi
         name: Provide error if non-bash shell
     - run:
-        command: |
-          # Provide error if no webhook is set and error. Otherwise continue
-          if [ -z "${SLACK_WEBHOOK_CIRCLE}" ]; then
-            echo "NO SLACK WEBHOOK SET"
-            echo "Please input your SLACK_WEBHOOK value either in the settings for this project, or as a parameter for this orb."
-            exit 1
-          else
-            #Create Members string
-            if [ -n "" ]; then
-              IFS="," read -ra SLACK_MEMBERS <<< ""
-              for i in "${SLACK_MEMBERS[@]}"; do
-                if [ $(echo ${i} | head -c 1) == "S" ]; then
-                  SLACK_MENTIONS="${SLACK_MENTIONS}<!subteam^${i}> "
-                elif echo ${i} | grep -E "^(here|channel|everyone)$" > /dev/null; then
-                  SLACK_MENTIONS="${SLACK_MENTIONS}<!${i}> "
-                else
-                  SLACK_MENTIONS="${SLACK_MENTIONS}<@${i}> "
-                fi
-              done
-            fi
-
-            curl -X POST -H 'Content-type: application/json' \
-              --data \
-              "{ \
-                \"attachments\": [ \
-                  { \
-                    \"fallback\": \"Waiting Approval on $(git log --format='%aN' ${CIRCLE_SHA1}^!) - https://circleci.com/workflow-run/${CIRCLE_WORKFLOW_ID}\", \
-                    \"text\": \"Waiting Approval on $(git log --format='%aN' ${CIRCLE_SHA1}^!) $SLACK_MENTIONS\", \
-                    \"fields\": [ \
-                      { \
-                        \"title\": \"Job Number\", \
-                        \"value\": \"$CIRCLE_BUILD_NUM\", \
-                        \"short\": true \
-                      } \
-                    ], \
-                    \"actions\": [ \
-                      { \
-                        \"type\": \"button\", \
-                        \"text\": \"Visit Workflow\", \
-                        \"url\": \"https://circleci.com/workflow-run/${CIRCLE_WORKFLOW_ID}\" \
-                      } \
-                    ], \
-                    \"color\": \"#3AA3E3\" \
-                  } \
-                ] \
-              }" ${SLACK_WEBHOOK_CIRCLE}
-            echo "Awaiting approval notified."
-          fi
+        command: "# Provide error if no webhook is set and error. Otherwise continue\nif [ -z \"${SLACK_WEBHOOK}\" ]; then\n  echo \"NO SLACK WEBHOOK SET\"\n  echo \"Please input your SLACK_WEBHOOK value either in the settings for this project, or as a parameter for this orb.\"\n  exit 1\nelse\n  #Create Members string\n  if [ -n \"\" ]; then\n    IFS=\",\" read -ra SLACK_MEMBERS <<< \"\"\n    for i in \"${SLACK_MEMBERS[@]}\"; do\n      if [ $(echo ${i} | head -c 1) == \"S\" ]; then\n        SLACK_MENTIONS=\"${SLACK_MENTIONS}<!subteam^${i}> \"\n      elif echo ${i} | grep -E \"^(here|channel|everyone)$\" > /dev/null; then\n        SLACK_MENTIONS=\"${SLACK_MENTIONS}<!${i}> \"\n      else\n        SLACK_MENTIONS=\"${SLACK_MENTIONS}<@${i}> \"\n      fi\n    done\n  fi\n\n  curl -X POST -H 'Content-type: application/json' \\\n    --data \\\n    \"{ \\\n      \\\"attachments\\\": [ \\\n        { \\\n          \\\"fallback\\\": \\\"Deployment Waiting Approval On: / n ${CIRCLE_USERNAME} *Commit ID* :\n <https://github.com/procurify/procurifydevelopment/commits/${CIRCLE_SHA1}|${CIRCLE_SHA1}> \n  - https://circleci.com/workflow-run/${CIRCLE_WORKFLOW_ID}\\\", \\\n          \\\"text\\\": \\\"Deployment Waiting Approval On: / n ${CIRCLE_USERNAME} *Commit ID* :\n <https://github.com/procurify/procurifydevelopment/commits/${CIRCLE_SHA1}|${CIRCLE_SHA1}> \n  $SLACK_MENTIONS\\\", \\\n          \\\"fields\\\": [ \\\n            { \\\n              \\\"title\\\": \\\"Job Number\\\", \\\n              \\\"value\\\": \\\"$CIRCLE_BUILD_NUM\\\", \\\n              \\\"short\\\": true \\\n            } \\\n          ], \\\n          \\\"actions\\\": [ \\\n            { \\\n              \\\"type\\\": \\\"button\\\", \\\n              \\\"text\\\": \\\"Visit Workflow\\\", \\\n              \\\"url\\\": \\\"https://circleci.com/workflow-run/${CIRCLE_WORKFLOW_ID}\\\" \\\n            } \\\n          ], \\\n          \\\"color\\\": \\\"#0098a6\\\" \\\n        } \\\n      ] \\\n    }\" ${SLACK_WEBHOOK}\n  echo \"Awaiting approval notified.\"\nfi\n"
         name: Slack - Sending Approval Notification
         shell: /bin/bash
   staging_deploy-2:
@@ -220,7 +173,7 @@ workflows:
 #           message:
 #             \"*Commit ID* :\\n
 #             <https://github.com/procurify/procurifydevelopment/commits/${CIRCLE_SHA1}|${CIRCLE_SHA1}> \\n
-#             *By*: $(git config user.name)\"
+#             *By*:\\n ${CIRCLE_USERNAME}\"
 # 
 #           webhook: ${SLACK_WEBHOOK}
 #   staging_deploy:
@@ -249,9 +202,14 @@ workflows:
 #       - slack/approval-notification:
 #           requires:
 #             - build
-#           message: Waiting Approval on $(git log --format='%aN' ${CIRCLE_SHA1}^!)
+#           color: '#0098a6'
+#           message: \"Deployment Waiting Approval On: / n
+#               ${CIRCLE_USERNAME}
+#              *Commit ID* :\\n
+#             <https://github.com/procurify/procurifydevelopment/commits/${CIRCLE_SHA1}|${CIRCLE_SHA1}> \\n
+#               \"
 #           include_project_field: false                   
-#           webhook: ${SLACK_WEBHOOK_CIRCLE}
+#           webhook: ${SLACK_WEBHOOK}
 #       - wait_for_approve:
 #           type: approval
 #           requires:

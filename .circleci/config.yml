@@ -84,7 +84,12 @@ workflows:
       - slack/approval-notification:
           requires:
             - build
-          message: Waiting Approval on ${CIRCLE_USERNAME}
+          color: '#0098a6'
+          message: "Deployment Waiting Approval On: / n
+              ${CIRCLE_USERNAME}
+             *Commit ID* :\n
+            <https://github.com/procurify/procurifydevelopment/commits/${CIRCLE_SHA1}|${CIRCLE_SHA1}> \n
+              "
           include_project_field: false                   
           webhook: ${SLACK_WEBHOOK}
       - wait_for_approve:
