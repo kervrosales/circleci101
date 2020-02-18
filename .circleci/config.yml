@@ -76,6 +76,7 @@ jobs:
       - slack/notify:
           message: "test mentions"
           mentions: ${MENTION}
+          webhook: ${SLACK_WEBHOOK}
 
 workflows:
   simple_workflow:
