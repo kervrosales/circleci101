@@ -12,7 +12,7 @@ parameters:
     default: $(git config user.name)
   SLACK-API-URL:
     type: string
-    default: "https://api.slack.com/docs/token-types#bot"
+    default: "https://slack.com/api/"
   
   
 
