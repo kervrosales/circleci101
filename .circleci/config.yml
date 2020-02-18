@@ -10,9 +10,9 @@ parameters:
   deployer:
     type: string
     default: $(git config user.name)
-  commit-link:
+  SLACK-API-URL:
     type: string
-    default: "https://github.com/procurify/procurifydevelopment/commits"
+    default: "https://api.slack.com/docs/token-types#bot"
   
   
 
@@ -61,6 +61,18 @@ jobs:
   staging_deploy:
     executor: python-executor
     steps:
+      - checkout
+      - run:  
+          name: get slack id
+          command: |
+            AUTHOR_EMAIL=$(git log -n1 --format='%ae' $CIRCLE_SHA1)
+            LOOKUP_RESULT=$(curl -s "${SLACK_API_URL}/users.lookupByEmail?token=${SLACK_BOT_TOKEN}&email=${AUTHOR_EMAIL}")
+            SUCCESS=$(echo "$LOOKUP_RESULT" | jq ".ok")
+            if [[ "$SUCCESS" == "true" ]]; then
+              USER_ID=$(echo "$LOOKUP_RESULT" | jq -r ".user.id")
+              CHANNEL=$USER_ID
+              NAME=$(echo "$LOOKUP_RESULT" | jq -r ".user.name")
+              MENTION="<@${USER_ID}>"
       - deploy:
           name: Staging Deployment
           command: |
@@ -69,21 +81,10 @@ jobs:
 workflows:
   simple_workflow:
     jobs:
-      - build
       - staging_deploy
-      - testimio/run_tests:
-          token: ${TESTIM_TOKEN}
-          project_id: ${TESTIMPROJECT_ID}
-          grid_name: 'Testim-Grid'
-          options:  |
-            ' "Regression:Navigation"'
-            filters:
-              branches:
-                only:
-                    - /^development$/
       - slack/approval-notification:
           requires:
-            - build
+            - staging_deploy
           message: "*This Deployment is waiting for approval from*: \n
               ${CIRCLE_USERNAME}\n
              *Commit ID* :\n
@@ -93,8 +94,5 @@ workflows:
           webhook: ${SLACK_WEBHOOK}
       - wait_for_approve:
           type: approval
-          requires:
-            - testimio/run_tests
-      - staging_deploy:
-          requires:
-            - wait_for_approve
+      - build
+          
