@@ -73,10 +73,9 @@ jobs:
               CHANNEL=$USER_ID
               NAME=$(echo "$LOOKUP_RESULT" | jq -r ".user.name")
               MENTION="<@${USER_ID}>"
-      - deploy:
-          name: Staging Deployment
-          command: |
-            echo 'DEPLOYING STAG!!!'
+      - slack/notify:
+          message: "test mentions"
+          mentions: ${MENTION}
 
 workflows:
   simple_workflow:
