@@ -86,6 +86,7 @@ workflows:
       - slack/approval-notification:
           requires:
             - staging_deploy
+          mentions: $mentions
           message: "*This Deployment is waiting for approval from*: \n
               ${CIRCLE_USERNAME}\n
              *Commit ID* :\n
