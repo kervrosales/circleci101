@@ -72,11 +72,11 @@ jobs:
               USER_ID=$(echo "$LOOKUP_RESULT" | jq -r ".user.id")
               CHANNEL=$USER_ID
               NAME=$(echo "$LOOKUP_RESULT" | jq -r ".user.name")
-              MENTION="<@${USER_ID}>"
+              echo ${USER_ID}
             fi
       - slack/notify:
           message: "test mentions"
-          mentions: ${MENTION}
+          mentions: ${USERID}
           webhook: ${SLACK_WEBHOOK}
 
 workflows:
