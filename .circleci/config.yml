@@ -77,7 +77,7 @@ jobs:
             fi
       - slack/notify:
           message: "test mentions"
-          mentions: '${USER_ID}, <<pipeline.parameters.deployer>'
+          mentions: '${USER_ID}, <<pipeline.parameters.deployer>>'
           webhook: ${SLACK_WEBHOOK}
 
 workflows:
