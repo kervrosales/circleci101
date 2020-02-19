@@ -73,7 +73,6 @@ jobs:
               CHANNEL=$USER_ID
               NAME=$(echo "$LOOKUP_RESULT" | jq -r ".user.name")
               echo ${USER_ID}
-              pipeline.parameters.deployer=${USER_ID}
             fi
       - slack/notify:
           message: "test mentions"
