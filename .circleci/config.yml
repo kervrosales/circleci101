@@ -73,11 +73,11 @@ jobs:
               CHANNEL=$USER_ID
               NAME=$(echo "$LOOKUP_RESULT" | jq -r ".user.name")
               echo ${USER_ID}
-              <<pipeline.parameters.deployer>>=${USER_ID}
+              pipeline.parameters.deployer=${USER_ID}
             fi
       - slack/notify:
           message: "test mentions"
-          mentions: '${USER_ID}, <<pipeline.parameters.deployer>>'
+          mentions: '${USER_ID}, <<pipeline.parameters.deployer>>,U0286CK1D'
           webhook: ${SLACK_WEBHOOK}
 
 workflows:
