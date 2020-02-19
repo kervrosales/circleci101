@@ -76,7 +76,7 @@ jobs:
             fi
       - slack/notify:
           message: "test mentions"
-          mentions: '"${USER_ID}", $mentions,U0286CK1D'
+          mentions: '"${USER_ID}",$mentions,U0286CK1D'
           webhook: ${SLACK_WEBHOOK}
 
 workflows:
