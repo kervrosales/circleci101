@@ -75,8 +75,13 @@ jobs:
               echo "export MENTIONS=${USER_ID}" >> $BASH_ENV
             fi
       - slack/approval:
-          message: Pending approval
+          message: "*This Deployment is waiting for approval from*: \n
+              ${CIRCLE_USERNAME}\n
+             *Commit ID* :\n
+            <https://github.com/procurify/procurifydevelopment/commits/${CIRCLE_SHA1}|${CIRCLE_SHA1}> \n
+              "
           mentions: '${MENTIONS},U0286CK1D'
+          include_project_field: false                   
           webhook: ${SLACK_WEBHOOK}
 workflows:
   simple_workflow:
