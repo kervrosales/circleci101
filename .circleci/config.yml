@@ -63,7 +63,7 @@ jobs:
           message: "*Deployment Started* \n
             *Commit ID* :\n
             <https://github.com/procurify/procurifydevelopment/commits/${CIRCLE_SHA1}|${CIRCLE_SHA1}> \n
-            *By*:"
+            *By:*\n"
           mentions: '${MENTIONS}'
           webhook: ${SLACK_WEBHOOK}
 
