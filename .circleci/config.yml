@@ -70,6 +70,7 @@ jobs:
             *By*:"
           mentions: '${MENTIONS}'
           webhook: ${SLACK_WEBHOOK}
+
   staging_deploy:
     executor: python-executor
     steps:
@@ -95,7 +96,6 @@ jobs:
             *Approver:*\n"
           include_project_field: false                   
           webhook: ${SLACK_WEBHOOK}
-          ts:  <<pipeline.parameters.timestamp>>
 workflows:
   simple_workflow:
     jobs:
