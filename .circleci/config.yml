@@ -58,12 +58,10 @@ jobs:
               echo "export MENTIONS=${USER_ID}" >> $BASH_ENV
             fi
       - slack/notify:
-          title: "Deployment Started"
-          title_link: https://github.com/procurify/procurifydevelopment/commits/${CIRCLE_SHA1}
           include_project_field: false
           ts:  <<pipeline.parameters.timestamp>>
-          message:
-            "*Commit ID* :\n
+          message: "*Deployment Started* \n
+            *Commit ID* :\n
             <https://github.com/procurify/procurifydevelopment/commits/${CIRCLE_SHA1}|${CIRCLE_SHA1}> \n
             *By*:"
           mentions: '${MENTIONS}'
