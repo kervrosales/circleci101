@@ -48,6 +48,7 @@ jobs:
   build:
     executor: python-executor
     steps:
+      - checkout
       - run: *get-slack-id
       - run:
           name: The First Step
@@ -78,6 +79,7 @@ jobs:
     steps:
       - attach_workspace:
           at: *workspace
+      - checkout
       - run: *get-slack-id
       - slack/approval:
           color: '#0098a6'
