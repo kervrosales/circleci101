@@ -46,6 +46,18 @@ jobs:
               echo 'This is the delivery pipeline'
             fi
             git log --format='%aN' ${CIRCLE_SHA1}^!
+      - run:  
+          name: get slack id
+          command: |
+            AUTHOR_EMAIL=$(git log -n1 --format='%ae' $CIRCLE_SHA1)
+            LOOKUP_RESULT=$(curl -s "${SLACK_API_URL}/users.lookupByEmail?token=${SLACK_BOT_TOKEN}&email=${AUTHOR_EMAIL}")
+            SUCCESS=$(echo "$LOOKUP_RESULT" | jq ".ok")
+            if [[ "$SUCCESS" == "true" ]]; then
+              USER_ID=$(echo "$LOOKUP_RESULT" | jq -r ".user.id")
+              CHANNEL=$USER_ID
+              NAME=$(echo "$LOOKUP_RESULT" | jq -r ".user.name")
+              echo "export MENTIONS=${USER_ID}" >> $BASH_ENV
+            fi
       - slack/notify:
           color: '#0098a6'
           title: "Deployment Started"
@@ -55,8 +67,8 @@ jobs:
           message:
             "*Commit ID* :\n
             <https://github.com/procurify/procurifydevelopment/commits/${CIRCLE_SHA1}|${CIRCLE_SHA1}> \n
-            *By*:\n ${CIRCLE_USERNAME}"
-
+            *By*:"
+           mentions: '${MENTIONS}'
           webhook: ${SLACK_WEBHOOK}
   staging_deploy:
     executor: python-executor
@@ -75,13 +87,15 @@ jobs:
               echo "export MENTIONS=${USER_ID}" >> $BASH_ENV
             fi
       - slack/approval:
+          color: '#0098a6'
           mentions: '${MENTIONS},U0286CK1D'
-          message: "*This Deployment Pending Approval* \n*
+          message: "*Pending Deployment* \n
              *Commit ID* :\n
             <https://github.com/procurify/procurifydevelopment/commits/${CIRCLE_SHA1}|${CIRCLE_SHA1}> \n
-            *By:*\n"
+            *Approver:*\n"
           include_project_field: false                   
           webhook: ${SLACK_WEBHOOK}
+          ts:  <<pipeline.parameters.timestamp>>
 workflows:
   simple_workflow:
     jobs:
