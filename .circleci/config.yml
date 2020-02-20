@@ -77,12 +77,7 @@ jobs:
       - slack/approval-notification:
           message: Pending approval
           webhook: webhook
-          mentions: ${MENTIONS},U0286CK1D'
-      - slack/notify:
-          message: "test mentions"
-          mentions: ${MENTIONS},U0286CK1D'
-          webhook: ${SLACK_WEBHOOK}
-
+          mentions:'${MENTIONS},U0286CK1D'
 workflows:
   simple_workflow:
     jobs:
