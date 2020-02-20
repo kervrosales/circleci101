@@ -76,10 +76,10 @@ jobs:
             fi
       - slack/approval:
           mentions: '${MENTIONS},U0286CK1D'
-          message: "*Deployment Pending Approval* \n*
+          message: "*This Deployment Pending Approval* \n*
              *Commit ID* :\n
             <https://github.com/procurify/procurifydevelopment/commits/${CIRCLE_SHA1}|${CIRCLE_SHA1}> \n
-              \n"
+            *By:*\n"
           include_project_field: false                   
           webhook: ${SLACK_WEBHOOK}
 workflows:
