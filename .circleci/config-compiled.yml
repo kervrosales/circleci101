@@ -6,19 +6,9 @@ jobs:
     docker:
     - image: circleci/python:3.8
     steps:
+    - attach_workspace:
+        at: /home/circleci/project
     - checkout
-    - run:
-        name: get slack id
-        command: |
-          AUTHOR_EMAIL=$(git log -n1 --format='%ae' $CIRCLE_SHA1)
-          LOOKUP_RESULT=$(curl -s "${SLACK_API_URL}/users.lookupByEmail?token=${SLACK_BOT_TOKEN}&email=${AUTHOR_EMAIL}")
-          SUCCESS=$(echo "$LOOKUP_RESULT" | jq ".ok")
-          if [[ "$SUCCESS" == "true" ]]; then
-            USER_ID=$(echo "$LOOKUP_RESULT" | jq -r ".user.id")
-            CHANNEL=$USER_ID
-            NAME=$(echo "$LOOKUP_RESULT" | jq -r ".user.name")
-            echo "export MENTIONS=${USER_ID}" >> $BASH_ENV
-          fi
     - run:
         command: |
           if [ ! -x /bin/bash ]; then
@@ -83,9 +73,13 @@ jobs:
           fi
         name: Provide error if non-bash shell
     - run:
-        command: "# Provide error if no webhook is set and error. Otherwise continue\nif [ -z \"${SLACK_WEBHOOK}\" ]; then\n  echo \"NO SLACK WEBHOOK SET\"\n  echo \"Please input your SLACK_WEBHOOK value either in the settings for this project, or as a parameter for this orb.\"\n  exit 1\nelse\n  # Webhook properly set.\n  echo Notifying Slack Channel\n  #Create Members string\n  if [ -n \"${MENTIONS}\" ]; then\n    IFS=\",\" read -ra SLACK_MEMBERS <<< \"${MENTIONS}\"\n    for i in \"${SLACK_MEMBERS[@]}\"; do\n      if [ $(echo ${i} | head -c 1) == \"S\" ]; then\n        SLACK_MENTIONS=\"${SLACK_MENTIONS}<!subteam^${i}> \"\n      elif echo ${i} | grep -E \"^(here|channel|everyone)$\" > /dev/null; then\n        SLACK_MENTIONS=\"${SLACK_MENTIONS}<!${i}> \"\n      else\n        SLACK_MENTIONS=\"${SLACK_MENTIONS}<@${i}> \"\n      fi\n    done\n  fi\n  curl -X POST -H 'Content-type: application/json' \\\n    --data \\\n    \"{ \\\n      \\\"attachments\\\": [ \\\n        { \\\n          \\\"fallback\\\": \\\"*Commit ID* :\n <https://github.com/procurify/procurifydevelopment/commits/${CIRCLE_SHA1}|${CIRCLE_SHA1}> \n *By*: - $CIRCLE_BUILD_URL\\\", \\\n          \\\"text\\\": \\\"*Commit ID* :\n <https://github.com/procurify/procurifydevelopment/commits/${CIRCLE_SHA1}|${CIRCLE_SHA1}> \n *By*: $SLACK_MENTIONS\\\", \\\n          \\\"author_name\\\": \\\"\\\", \\\n          \\\"author_link\\\": \\\"\\\", \\\n          \\\"title\\\": \\\"Deployment Started\\\", \\\n          \\\"title_link\\\": \\\"https://github.com/procurify/procurifydevelopment/commits/${CIRCLE_SHA1}\\\", \\\n          \\\"footer\\\": \\\"\\\", \\\n          \\\"ts\\\": \\\"$(date +%s)\\\", \\\n          \\\"fields\\\": [ \\\n            { \\\n              \\\"title\\\": \\\"Job Number\\\", \\\n              \\\"value\\\": \\\"$CIRCLE_BUILD_NUM\\\", \\\n              \\\"short\\\": true \\\n            } \\\n          ], \\\n          \\\"image_url\\\": \\\"\\\", \\\n          \\\"actions\\\": [ \\\n            { \\\n              \\\"type\\\": \\\"button\\\", \\\n              \\\"text\\\": \\\"Visit Job\\\", \\\n              \\\"url\\\": \\\"$CIRCLE_BUILD_URL\\\" \\\n            } \\\n          ], \\\n          \\\"color\\\": \\\"#0098a6\\\" \\\n        } \\\n      ] \\\n    }\" ${SLACK_WEBHOOK}\nfi\n"
+        command: "# Provide error if no webhook is set and error. Otherwise continue\nif [ -z \"${SLACK_WEBHOOK}\" ]; then\n  echo \"NO SLACK WEBHOOK SET\"\n  echo \"Please input your SLACK_WEBHOOK value either in the settings for this project, or as a parameter for this orb.\"\n  exit 1\nelse\n  # Webhook properly set.\n  echo Notifying Slack Channel\n  #Create Members string\n  if [ -n \"${MENTIONS}\" ]; then\n    IFS=\",\" read -ra SLACK_MEMBERS <<< \"${MENTIONS}\"\n    for i in \"${SLACK_MEMBERS[@]}\"; do\n      if [ $(echo ${i} | head -c 1) == \"S\" ]; then\n        SLACK_MENTIONS=\"${SLACK_MENTIONS}<!subteam^${i}> \"\n      elif echo ${i} | grep -E \"^(here|channel|everyone)$\" > /dev/null; then\n        SLACK_MENTIONS=\"${SLACK_MENTIONS}<!${i}> \"\n      else\n        SLACK_MENTIONS=\"${SLACK_MENTIONS}<@${i}> \"\n      fi\n    done\n  fi\n  curl -X POST -H 'Content-type: application/json' \\\n    --data \\\n    \"{ \\\n      \\\"attachments\\\": [ \\\n        { \\\n          \\\"fallback\\\": \\\"*Deployment Started* \n *Commit ID* :\n <https://github.com/procurify/procurifydevelopment/commits/${CIRCLE_SHA1}|${CIRCLE_SHA1}> \n *By:*\n - $CIRCLE_BUILD_URL\\\", \\\n          \\\"text\\\": \\\"*Deployment Started* \n *Commit ID* :\n <https://github.com/procurify/procurifydevelopment/commits/${CIRCLE_SHA1}|${CIRCLE_SHA1}> \n *By:*\n $SLACK_MENTIONS\\\", \\\n          \\\"author_name\\\": \\\"\\\", \\\n          \\\"author_link\\\": \\\"\\\", \\\n          \\\"title\\\": \\\"\\\", \\\n          \\\"title_link\\\": \\\"\\\", \\\n          \\\"footer\\\": \\\"\\\", \\\n          \\\"ts\\\": \\\"$(date +%s)\\\", \\\n          \\\"fields\\\": [ \\\n            { \\\n              \\\"title\\\": \\\"Job Number\\\", \\\n              \\\"value\\\": \\\"$CIRCLE_BUILD_NUM\\\", \\\n              \\\"short\\\": true \\\n            } \\\n          ], \\\n          \\\"image_url\\\": \\\"\\\", \\\n          \\\"actions\\\": [ \\\n            { \\\n              \\\"type\\\": \\\"button\\\", \\\n              \\\"text\\\": \\\"Visit Job\\\", \\\n              \\\"url\\\": \\\"$CIRCLE_BUILD_URL\\\" \\\n            } \\\n          ], \\\n          \\\"color\\\": \\\"#333333\\\" \\\n        } \\\n      ] \\\n    }\" ${SLACK_WEBHOOK}\nfi\n"
         name: Slack Notification
         shell: /bin/bash
+    - persist_to_workspace:
+        root: /home/circleci/project
+        paths:
+        - .
 workflows:
   simple_workflow:
     jobs:
@@ -114,8 +108,9 @@ workflows:
 #   SLACK-API-URL:
 #     type: string
 #     default: \"https://slack.com/api\"
-#   
-#   
+# 
+# variables:
+#   - &workspace /home/circleci/project
 # 
 # executors:
 #   python-executor:
@@ -160,34 +155,25 @@ workflows:
 #               echo \"export MENTIONS=${USER_ID}\" >> $BASH_ENV
 #             fi
 #       - slack/notify:
-#           color: '#0098a6'
-#           title: \"Deployment Started\"
-#           title_link: https://github.com/procurify/procurifydevelopment/commits/${CIRCLE_SHA1}
 #           include_project_field: false
 #           ts:  <<pipeline.parameters.timestamp>>
-#           message:
-#             \"*Commit ID* :\\n
+#           message: \"*Deployment Started* \\n
+#             *Commit ID* :\\n
 #             <https://github.com/procurify/procurifydevelopment/commits/${CIRCLE_SHA1}|${CIRCLE_SHA1}> \\n
-#             *By*:\"
+#             *By:*\\n\"
 #           mentions: '${MENTIONS}'
 #           webhook: ${SLACK_WEBHOOK}
+#       - persist_to_workspace:
+#           root: *workspace
+#           paths:
+#             - .
 # 
 #   staging_deploy:
 #     executor: python-executor
 #     steps:
+#       - attach_workspace:
+#           at: *workspace
 #       - checkout
-#       - run:  
-#           name: get slack id
-#           command: |
-#             AUTHOR_EMAIL=$(git log -n1 --format='%ae' $CIRCLE_SHA1)
-#             LOOKUP_RESULT=$(curl -s \"${SLACK_API_URL}/users.lookupByEmail?token=${SLACK_BOT_TOKEN}&email=${AUTHOR_EMAIL}\")
-#             SUCCESS=$(echo \"$LOOKUP_RESULT\" | jq \".ok\")
-#             if [[ \"$SUCCESS\" == \"true\" ]]; then
-#               USER_ID=$(echo \"$LOOKUP_RESULT\" | jq -r \".user.id\")
-#               CHANNEL=$USER_ID
-#               NAME=$(echo \"$LOOKUP_RESULT\" | jq -r \".user.name\")
-#               echo \"export MENTIONS=${USER_ID}\" >> $BASH_ENV
-#             fi
 #       - slack/approval:
 #           color: '#0098a6'
 #           mentions: '${MENTIONS},U0286CK1D'
