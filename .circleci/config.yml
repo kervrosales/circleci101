@@ -72,11 +72,15 @@ jobs:
               USER_ID=$(echo "$LOOKUP_RESULT" | jq -r ".user.id")
               CHANNEL=$USER_ID
               NAME=$(echo "$LOOKUP_RESULT" | jq -r ".user.name")
-              echo "export mentions=${USER_ID}" >> $BASH_ENV
+              echo "export MENTIONS=${USER_ID}" >> $BASH_ENV
             fi
+      - slack/approval-notification:
+          message: Pending approval
+          webhook: webhook
+          mentions: ${MENTIONS},U0286CK1D'
       - slack/notify:
           message: "test mentions"
-          mentions: '"${USER_ID}",$mentions,U0286CK1D'
+          mentions: ${MENTIONS},U0286CK1D'
           webhook: ${SLACK_WEBHOOK}
 
 workflows:
@@ -86,7 +90,7 @@ workflows:
       - slack/approval-notification:
           requires:
             - staging_deploy
-          mentions: $mentions
+          mentions: ${MENTIONS}
           message: "*This Deployment is waiting for approval from*: \n
               ${CIRCLE_USERNAME}\n
              *Commit ID* :\n
