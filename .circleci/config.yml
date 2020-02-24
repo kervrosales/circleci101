@@ -51,7 +51,7 @@ orbs:
 
 jobs:
   build:
-    executor: testim-cli
+    executor: python-executor
     steps:
       - checkout
       - testimio/run_tests:
