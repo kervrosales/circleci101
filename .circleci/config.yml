@@ -39,6 +39,9 @@ aliases:
           NAME=$(echo "$LOOKUP_RESULT" | jq -r ".user.name")
           echo "export MENTIONS=${USER_ID}" >> $BASH_ENV
         fi
+        else
+          echo "Couldn't find user with the email \"${AUTHOR_EMAIL}\". Your email in Github must match your email in slack."
+        fi
 
 orbs:
   slack: circleci/slack@3.4.2
@@ -60,6 +63,13 @@ jobs:
               echo 'This is the delivery pipeline'
             fi
             git log --format='%aN' ${CIRCLE_SHA1}^!
+      - testimio/run_tests:
+          token: '${TESTIM_TOKEN}'
+          project_id: '${TESTIMPROJECT_ID}'
+          grid_name: 'Testim-Grid'
+          options:
+              '--name "navigation:navigation"'
+          
       - slack/notify:
           include_project_field: false
           ts:  <<pipeline.parameters.timestamp>>

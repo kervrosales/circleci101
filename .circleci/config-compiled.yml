@@ -8,6 +8,7 @@ jobs:
     steps:
     - attach_workspace:
         at: /home/circleci/project
+    - checkout
     - run:
         name: Get Slack ID of user for mentions
         command: |
@@ -19,6 +20,9 @@ jobs:
             CHANNEL=$USER_ID
             NAME=$(echo "$LOOKUP_RESULT" | jq -r ".user.name")
             echo "export MENTIONS=${USER_ID}" >> $BASH_ENV
+          fi
+          else
+            echo "Couldn't find user with the email \"${AUTHOR_EMAIL}\". Your email in Github must match your email in slack."
           fi
     - run:
         command: |
@@ -53,6 +57,7 @@ jobs:
     docker:
     - image: circleci/python:3.8
     steps:
+    - checkout
     - run:
         name: Get Slack ID of user for mentions
         command: |
@@ -65,6 +70,9 @@ jobs:
             NAME=$(echo "$LOOKUP_RESULT" | jq -r ".user.name")
             echo "export MENTIONS=${USER_ID}" >> $BASH_ENV
           fi
+          else
+            echo "Couldn't find user with the email \"${AUTHOR_EMAIL}\". Your email in Github must match your email in slack."
+          fi
     - run:
         name: The First Step
         command: |
@@ -75,6 +83,27 @@ jobs:
             echo 'This is the delivery pipeline'
           fi
           git log --format='%aN' ${CIRCLE_SHA1}^!
+    - run:
+        name: run tests
+        command: |
+          mkdir -p /tmp/circleci-test-results
+          OPTIONS='--name "navigation:navigation"'
+          if [[ -z ${OPTIONS} ]]; then
+            testim --project "${TESTIMPROJECT_ID}" \
+              --grid "Testim-Grid" \
+              --token "${TESTIM_TOKEN}" \
+              --report-file /tmp/circleci-test-results/reports.xml
+          else
+            testim --project "${TESTIMPROJECT_ID}" \
+              --grid "Testim-Grid" \
+              --token "${TESTIM_TOKEN}" \
+              --report-file /tmp/circleci-test-results/reports.xml \
+              --name "navigation:navigation"
+          fi
+    - store_artifacts:
+        path: /tmp/circleci-test-results
+    - store_test_results:
+        path: /tmp/circleci-test-results
     - run:
         command: |
           if [ ! -x /bin/bash ]; then
@@ -144,6 +173,9 @@ workflows:
 #           NAME=$(echo \"$LOOKUP_RESULT\" | jq -r \".user.name\")
 #           echo \"export MENTIONS=${USER_ID}\" >> $BASH_ENV
 #         fi
+#         else
+#           echo \"Couldn't find user with the email \\\"${AUTHOR_EMAIL}\\\". Your email in Github must match your email in slack.\"
+#         fi
 # 
 # orbs:
 #   slack: circleci/slack@3.4.2
@@ -153,6 +185,7 @@ workflows:
 #   build:
 #     executor: python-executor
 #     steps:
+#       - checkout
 #       - run: *get-slack-id
 #       - run:
 #           name: The First Step
@@ -164,6 +197,13 @@ workflows:
 #               echo 'This is the delivery pipeline'
 #             fi
 #             git log --format='%aN' ${CIRCLE_SHA1}^!
+#       - testimio/run_tests:
+#           token: '${TESTIM_TOKEN}'
+#           project_id: '${TESTIMPROJECT_ID}'
+#           grid_name: 'Testim-Grid'
+#           options:
+#               '--name \"navigation:navigation\"'
+#           
 #       - slack/notify:
 #           include_project_field: false
 #           ts:  <<pipeline.parameters.timestamp>>
@@ -183,6 +223,7 @@ workflows:
 #     steps:
 #       - attach_workspace:
 #           at: *workspace
+#       - checkout
 #       - run: *get-slack-id
 #       - slack/approval:
 #           color: '#0098a6'
