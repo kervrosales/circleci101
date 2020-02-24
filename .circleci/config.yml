@@ -54,7 +54,7 @@ jobs:
     executor: python-executor
     steps:
       - checkout
-      run:
+      - run:
         name: install testim cli
         command: |
         npm i -g @testim/testim-cli
