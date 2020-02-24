@@ -38,7 +38,6 @@ aliases:
           CHANNEL=$USER_ID
           NAME=$(echo "$LOOKUP_RESULT" | jq -r ".user.name")
           echo "export MENTIONS=${USER_ID}" >> $BASH_ENV
-        fi
         else
           echo "Couldn't find user with the email \"${AUTHOR_EMAIL}\". Your email in Github must match your email in slack."
         fi
