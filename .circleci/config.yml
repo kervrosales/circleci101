@@ -21,6 +21,9 @@ executors:
   python-executor:
     docker:
       - image: circleci/python:3.8
+  testim-cli:
+    docker:
+      - image: testim/docker-cli
 aliases:
   - &ola
       name: say ola
@@ -48,7 +51,7 @@ orbs:
 
 jobs:
   build:
-    executor: testim/docker-cli
+    executor: testim-cli
     steps:
       - checkout
       - run: *get-slack-id
