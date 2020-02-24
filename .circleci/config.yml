@@ -48,7 +48,7 @@ orbs:
 
 jobs:
   build:
-    executor: python-executor
+    executor: testim/docker-cli
     steps:
       - checkout
       - run: *get-slack-id
