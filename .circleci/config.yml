@@ -54,17 +54,6 @@ jobs:
     executor: testim-cli
     steps:
       - checkout
-      - run: *get-slack-id
-      - run:
-          name: The First Step
-          command: |
-            if ["${CIRCLE_BRANCH}" == "master"];
-            then
-              echo 'Hello World!'8
-            else
-              echo 'This is the delivery pipeline'
-            fi
-            git log --format='%aN' ${CIRCLE_SHA1}^!
       - testimio/run_tests:
           token: '${TESTIM_TOKEN}'
           project_id: '${TESTIMPROJECT_ID}'
