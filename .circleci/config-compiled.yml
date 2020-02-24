@@ -20,7 +20,6 @@ jobs:
             CHANNEL=$USER_ID
             NAME=$(echo "$LOOKUP_RESULT" | jq -r ".user.name")
             echo "export MENTIONS=${USER_ID}" >> $BASH_ENV
-          fi
           else
             echo "Couldn't find user with the email \"${AUTHOR_EMAIL}\". Your email in Github must match your email in slack."
           fi
@@ -59,30 +58,9 @@ jobs:
     steps:
     - checkout
     - run:
-        name: Get Slack ID of user for mentions
+        name: install testim cli
         command: |
-          AUTHOR_EMAIL=$(git log -n1 --format='%ae' $CIRCLE_SHA1)
-          LOOKUP_RESULT=$(curl -s "${SLACK_API_URL}/users.lookupByEmail?token=${SLACK_BOT_TOKEN}&email=${AUTHOR_EMAIL}")
-          SUCCESS=$(echo "$LOOKUP_RESULT" | jq ".ok")
-          if [[ "$SUCCESS" == "true" ]]; then
-            USER_ID=$(echo "$LOOKUP_RESULT" | jq -r ".user.id")
-            CHANNEL=$USER_ID
-            NAME=$(echo "$LOOKUP_RESULT" | jq -r ".user.name")
-            echo "export MENTIONS=${USER_ID}" >> $BASH_ENV
-          fi
-          else
-            echo "Couldn't find user with the email \"${AUTHOR_EMAIL}\". Your email in Github must match your email in slack."
-          fi
-    - run:
-        name: The First Step
-        command: |
-          if ["${CIRCLE_BRANCH}" == "master"];
-          then
-            echo 'Hello World!'8
-          else
-            echo 'This is the delivery pipeline'
-          fi
-          git log --format='%aN' ${CIRCLE_SHA1}^!
+          npm i -g @testim/testim-cli
     - run:
         name: run tests
         command: |
@@ -155,6 +133,9 @@ workflows:
 #   python-executor:
 #     docker:
 #       - image: circleci/python:3.8
+#   testim-cli:
+#     docker:
+#       - image: testim/docker-cli
 # aliases:
 #   - &ola
 #       name: say ola
@@ -172,7 +153,6 @@ workflows:
 #           CHANNEL=$USER_ID
 #           NAME=$(echo \"$LOOKUP_RESULT\" | jq -r \".user.name\")
 #           echo \"export MENTIONS=${USER_ID}\" >> $BASH_ENV
-#         fi
 #         else
 #           echo \"Couldn't find user with the email \\\"${AUTHOR_EMAIL}\\\". Your email in Github must match your email in slack.\"
 #         fi
@@ -186,17 +166,10 @@ workflows:
 #     executor: python-executor
 #     steps:
 #       - checkout
-#       - run: *get-slack-id
 #       - run:
-#           name: The First Step
+#           name: install testim cli
 #           command: |
-#             if [\"${CIRCLE_BRANCH}\" == \"master\"];
-#             then
-#               echo 'Hello World!'8
-#             else
-#               echo 'This is the delivery pipeline'
-#             fi
-#             git log --format='%aN' ${CIRCLE_SHA1}^!
+#             npm i -g @testim/testim-cli
 #       - testimio/run_tests:
 #           token: '${TESTIM_TOKEN}'
 #           project_id: '${TESTIMPROJECT_ID}'
