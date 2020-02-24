@@ -54,6 +54,10 @@ jobs:
     executor: python-executor
     steps:
       - checkout
+      run:
+        name: install testim cli
+        command: |
+        npm i -g @testim/testim-cli
       - testimio/run_tests:
           token: '${TESTIM_TOKEN}'
           project_id: '${TESTIMPROJECT_ID}'
