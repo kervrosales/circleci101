@@ -60,24 +60,12 @@ jobs:
     - run:
         name: install testim cli
         command: |
-          npm i -g @testim/testim-cli
+          curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
+          sudo apt install nodejs
+          sudo npm i -g @testim/testim-cli
     - run:
         name: run tests
-        command: |
-          mkdir -p /tmp/circleci-test-results
-          OPTIONS='--name "navigation:navigation"'
-          if [[ -z ${OPTIONS} ]]; then
-            testim --project "${TESTIMPROJECT_ID}" \
-              --grid "Testim-Grid" \
-              --token "${TESTIM_TOKEN}" \
-              --report-file /tmp/circleci-test-results/reports.xml
-          else
-            testim --project "${TESTIMPROJECT_ID}" \
-              --grid "Testim-Grid" \
-              --token "${TESTIM_TOKEN}" \
-              --report-file /tmp/circleci-test-results/reports.xml \
-              --name "navigation:navigation"
-          fi
+        command: "mkdir -p /tmp/circleci-test-results\nOPTIONS='  --test-plan \"Regression:Finance\" --test-plan \"Regression:AP\" \\ --test-plan \"circleci:users\" --test-plan \"Regression:Receive\" \\ --test-plan \"circleci:payments\" --test-plan \"circleci:bills --test-plan \\ --test-plan \"circleci:budgets\" '\nif [[ -z ${OPTIONS} ]]; then\n  testim --project \"${TESTIMPROJECT_ID}\" \\\n    --grid \"Testim-Grid\" \\\n    --token \"${TESTIM_TOKEN}\" \\\n    --report-file /tmp/circleci-test-results/reports.xml\nelse\n  testim --project \"${TESTIMPROJECT_ID}\" \\\n    --grid \"Testim-Grid\" \\\n    --token \"${TESTIM_TOKEN}\" \\\n    --report-file /tmp/circleci-test-results/reports.xml \\\n      --test-plan \"Regression:Finance\" --test-plan \"Regression:AP\" \\ --test-plan \"circleci:users\" --test-plan \"Regression:Receive\" \\ --test-plan \"circleci:payments\" --test-plan \"circleci:bills --test-plan \\ --test-plan \"circleci:budgets\" \nfi\n"
     - store_artifacts:
         path: /tmp/circleci-test-results
     - store_test_results:
@@ -169,13 +157,18 @@ workflows:
 #       - run:
 #           name: install testim cli
 #           command: |
-#             npm i -g @testim/testim-cli
+#             curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
+#             sudo apt install nodejs
+#             sudo npm i -g @testim/testim-cli
 #       - testimio/run_tests:
 #           token: '${TESTIM_TOKEN}'
 #           project_id: '${TESTIMPROJECT_ID}'
 #           grid_name: 'Testim-Grid'
 #           options:
-#               '--name \"navigation:navigation\"'
+#               '  --test-plan \"Regression:Finance\" --test-plan \"Regression:AP\" \\
+#                 --test-plan \"circleci:users\" --test-plan \"Regression:Receive\" \\
+#                 --test-plan \"circleci:payments\" --test-plan \"circleci:bills --test-plan \\
+#                 --test-plan \"circleci:budgets\" '
 #           
 #       - slack/notify:
 #           include_project_field: false

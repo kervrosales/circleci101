@@ -65,7 +65,10 @@ jobs:
           project_id: '${TESTIMPROJECT_ID}'
           grid_name: 'Testim-Grid'
           options:
-              '--name "navigation:navigation"'
+              '  --test-plan "Regression:Finance" --test-plan "Regression:AP" \
+                --test-plan "circleci:users" --test-plan "Regression:Receive" \
+                --test-plan "circleci:payments" --test-plan "circleci:bills --test-plan \
+                --test-plan "circleci:budgets" '
           
       - slack/notify:
           include_project_field: false
