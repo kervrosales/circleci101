@@ -57,7 +57,9 @@ jobs:
       - run:
           name: install testim cli
           command: |
-            npm i -g @testim/testim-cli
+            curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
+            sudo apt install nodejs
+            sudo npm i -g @testim/testim-cli
       - testimio/run_tests:
           token: '${TESTIM_TOKEN}'
           project_id: '${TESTIMPROJECT_ID}'
