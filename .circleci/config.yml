@@ -65,9 +65,9 @@ jobs:
           project_id: '${TESTIMPROJECT_ID}'
           grid_name: 'Testim-Grid'
           options:
-              '  --test-plan "Regression:Finance" --test-plan "Regression:AP" \
-                --test-plan "circleci:users" --test-plan "Regression:Receive" \
-                --test-plan "circleci:payments" --test-plan "circleci:bills" --test-plan \
+              '  --test-plan "Regression:Finance" --test-plan "circleci:users"
+                 --test-plan "Regression:Receive" --test-plan "circleci:locations" 
+                --test-plan "circleci:payments" --test-plan "circleci:bills" 
                 --test-plan "circleci:budgets" '
           
       - slack/notify:
