@@ -55,17 +55,14 @@ jobs:
     executor: python-executor
     steps:
       - checkout
-      - run:
-          name: install testim cli
-          command: |
-            curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
-            sudo apt install nodejs
-            sudo npm i -g @testim/testim-cli
+      - attach_workspace:
+          at: /home/circleci/project
       - run: 
           name: create share environment variables in bash 
           command: |
-            echo 'export MY_ENV_VAR="FOO"' >> $BASH_ENV 
-            echo ${MY_ENV_VAR}
+            echo 'export MY_ENV_VAR="FOO"' >> shared_env
+            cat shared_env >> $BASH_ENV 
+           
       - run:
           name: "What was my custom environment variable?"
           command: echo ${MY_ENV_VAR}
@@ -80,7 +77,7 @@ jobs:
           mentions: '${MENTIONS}'
           webhook: ${SLACK_WEBHOOK}
       - persist_to_workspace:
-          root: *workspace
+          root: /home/circleci/project
           paths:
             - .
 
@@ -88,9 +85,11 @@ jobs:
     executor: python-executor
     steps:
       - attach_workspace:
-          at: *workspace
+          at: /home/circleci/project
       - checkout
       - run: *get-slack-id
+      - run: cat shared_env >> $BASH_ENV 
+      - run: echo ${MY_ENV_VAR}
       - slack/approval:
           color: '#0098a6'
           mentions: 'U0286CK1D'

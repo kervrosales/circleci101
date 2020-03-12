@@ -25,6 +25,10 @@ jobs:
             echo "Couldn't find user with the email \"${AUTHOR_EMAIL}\". Your email in Github must match your email in slack."
           fi
     - run:
+        command: cat shared_env >> $BASH_ENV
+    - run:
+        command: echo ${MY_ENV_VAR}
+    - run:
         command: |
           if [ ! -x /bin/bash ]; then
             echo Bash not installed.
@@ -58,17 +62,14 @@ jobs:
     - image: circleci/python:3.8
     steps:
     - checkout
-    - run:
-        name: install testim cli
-        command: |
-          curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
-          sudo apt install nodejs
-          sudo npm i -g @testim/testim-cli
+    - attach_workspace:
+        at: /home/circleci/project
     - run:
         name: create share environment variables in bash
-        command: |
-          echo "export STR="Hello World!"">> $BASH_ENV
-          echo $STR
+        command: "echo 'export MY_ENV_VAR=\"FOO\"' >> shared_env\ncat shared_env >> $BASH_ENV \n"
+    - run:
+        name: What was my custom environment variable?
+        command: echo ${MY_ENV_VAR}
     - run:
         command: |
           if [ ! -x /bin/bash ]; then
@@ -154,17 +155,17 @@ workflows:
 #     executor: python-executor
 #     steps:
 #       - checkout
-#       - run:
-#           name: install testim cli
-#           command: |
-#             curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
-#             sudo apt install nodejs
-#             sudo npm i -g @testim/testim-cli
+#       - attach_workspace:
+#           at: /home/circleci/project
 #       - run: 
 #           name: create share environment variables in bash 
 #           command: |
-#             echo \"export STR=\"Hello World!\"\">> $BASH_ENV
-#             echo $STR
+#             echo 'export MY_ENV_VAR=\"FOO\"' >> shared_env
+#             cat shared_env >> $BASH_ENV 
+#            
+#       - run:
+#           name: \"What was my custom environment variable?\"
+#           command: echo ${MY_ENV_VAR}
 #           
 #       - slack/notify:
 #           include_project_field: false
@@ -176,7 +177,7 @@ workflows:
 #           mentions: '${MENTIONS}'
 #           webhook: ${SLACK_WEBHOOK}
 #       - persist_to_workspace:
-#           root: *workspace
+#           root: /home/circleci/project
 #           paths:
 #             - .
 # 
@@ -184,9 +185,11 @@ workflows:
 #     executor: python-executor
 #     steps:
 #       - attach_workspace:
-#           at: *workspace
+#           at: /home/circleci/project
 #       - checkout
 #       - run: *get-slack-id
+#       - run: cat shared_env >> $BASH_ENV 
+#       - run: echo ${MY_ENV_VAR}
 #       - slack/approval:
 #           color: '#0098a6'
 #           mentions: 'U0286CK1D'
