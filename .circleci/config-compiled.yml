@@ -1,5 +1,6 @@
 # Orb 'circleci/slack@3.4.2' resolved to 'circleci/slack@3.4.2'
 # Orb 'testimio/runner@1.1.0' resolved to 'testimio/runner@1.1.0'
+# Orb 'circleci/sumologic@1.0.6' resolved to 'circleci/sumologic@1.0.6'
 version: 2
 jobs:
   staging_deploy:
@@ -64,12 +65,10 @@ jobs:
           sudo apt install nodejs
           sudo npm i -g @testim/testim-cli
     - run:
-        name: run tests
-        command: "mkdir -p /tmp/circleci-test-results\nOPTIONS='  --test-plan \"Regression:Finance\" --test-plan \"circleci:users\" --test-plan \"Regression:Receive\" --test-plan \"circleci:locations\" --test-plan \"circleci:payments\" --test-plan \"circleci:bills\" --test-plan \"circleci:budgets\" '\nif [[ -z ${OPTIONS} ]]; then\n  testim --project \"${TESTIMPROJECT_ID}\" \\\n    --grid \"Testim-Grid\" \\\n    --token \"${TESTIM_TOKEN}\" \\\n    --report-file /tmp/circleci-test-results/reports.xml\nelse\n  testim --project \"${TESTIMPROJECT_ID}\" \\\n    --grid \"Testim-Grid\" \\\n    --token \"${TESTIM_TOKEN}\" \\\n    --report-file /tmp/circleci-test-results/reports.xml \\\n      --test-plan \"Regression:Finance\" --test-plan \"circleci:users\" --test-plan \"Regression:Receive\" --test-plan \"circleci:locations\" --test-plan \"circleci:payments\" --test-plan \"circleci:bills\" --test-plan \"circleci:budgets\" \nfi\n"
-    - store_artifacts:
-        path: /tmp/circleci-test-results
-    - store_test_results:
-        path: /tmp/circleci-test-results
+        name: create share environment variables in bash
+        command: |
+          echo "export STR="Hello World!"">> $BASH_ENV
+          echo $STR
     - run:
         command: |
           if [ ! -x /bin/bash ]; then
@@ -148,6 +147,7 @@ workflows:
 # orbs:
 #   slack: circleci/slack@3.4.2
 #   testimio: testimio/runner@1.1.0
+#   sumologic: circleci/sumologic@1.0.6
 # 
 # jobs:
 #   build:
@@ -160,15 +160,11 @@ workflows:
 #             curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
 #             sudo apt install nodejs
 #             sudo npm i -g @testim/testim-cli
-#       - testimio/run_tests:
-#           token: '${TESTIM_TOKEN}'
-#           project_id: '${TESTIMPROJECT_ID}'
-#           grid_name: 'Testim-Grid'
-#           options:
-#               '  --test-plan \"Regression:Finance\" --test-plan \"circleci:users\"
-#                  --test-plan \"Regression:Receive\" --test-plan \"circleci:locations\" 
-#                 --test-plan \"circleci:payments\" --test-plan \"circleci:bills\" 
-#                 --test-plan \"circleci:budgets\" '
+#       - run: 
+#           name: create share environment variables in bash 
+#           command: |
+#             echo \"export STR=\"Hello World!\"\">> $BASH_ENV
+#             echo $STR
 #           
 #       - slack/notify:
 #           include_project_field: false
