@@ -64,7 +64,7 @@ jobs:
       - run: 
           name: create share environment variables in bash 
           command: |
-            echo "export STR="Hello World!"">> $BASH_ENV
+            echo "export STR="Hello World!"" >> $BASH_ENV
             echo $STR
           
       - slack/notify:
