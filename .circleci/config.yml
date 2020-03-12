@@ -65,6 +65,7 @@ jobs:
           name: create share environment variables in bash 
           command: |
             echo 'export MY_ENV_VAR="FOO"' >> $BASH_ENV 
+            echo ${MY_ENV_VAR}
       - run:
           name: "What was my custom environment variable?"
           command: echo ${MY_ENV_VAR}
