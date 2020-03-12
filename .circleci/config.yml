@@ -102,7 +102,6 @@ jobs:
 workflows:
   simple_workflow:
     jobs:
-      - staging_deploy
       - slack/approval-notification:
           requires:
             - staging_deploy
@@ -117,4 +116,7 @@ workflows:
       - wait_for_approve:
           type: approval
       - build
+      - staging_deploy:
+          requires:
+            - build
           
