@@ -88,7 +88,7 @@ jobs:
           at: /home/circleci/project
       - checkout
       - run: *get-slack-id
-      - run: cat shared_env >> $BASH_ENV 
+      #- run: cat shared_env >> $BASH_ENV 
       - run: echo ${MY_ENV_VAR}
       - slack/approval:
           color: '#0098a6'
