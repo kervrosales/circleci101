@@ -64,8 +64,10 @@ jobs:
       - run: 
           name: create share environment variables in bash 
           command: |
-            echo "export STR="Hello World!"" >> $BASH_ENV
-            echo $STR
+            echo 'export MY_ENV_VAR="FOO"' >> $BASH_ENV 
+      - run:
+          name: "What was my custom environment variable?"
+          command: echo ${MY_ENV_VAR}
           
       - slack/notify:
           include_project_field: false
