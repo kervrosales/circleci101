@@ -66,6 +66,7 @@ jobs:
           name: "Setup custom environment variables"
           command: |
             echo 'export MY_ENV_VAR="FOO"' >> $BASH_ENV 
+            echo $BASH_ENV 
             # Redirect MY_ENV_VAR into $BASH_ENV
       # Run a step to print what branch our code base is on.
       - run: # test what branch we're on.
@@ -104,7 +105,11 @@ jobs:
       - run: *get-slack-id
       #- run: cat shared_env >> $BASH_ENV 
       #test
-      - run: echo ${MY_ENV_VAR}
+      - run: 
+          name: check if BASH environment variables traverse different jobs
+          command: |
+            echo $BASH_ENV
+            echo ${MY_ENV_VAR}
       - slack/approval:
           color: '#0098a6'
           mentions: 'U0286CK1D'
