@@ -6,7 +6,6 @@ jobs:
     steps:
       - run: echo "A first hello"
       - run: echo "test" |cat  >> test.txt
-      - run: echo "Trying out workspaces" > my_workspace/echo-output
        
   two:
     docker:
