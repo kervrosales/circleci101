@@ -6,12 +6,19 @@ jobs:
     steps:
       - run: echo "A first hello"
       - run: echo "test" |cat  >> test.txt
+      - save_cache:
+          key: my-cache-123
+          paths:
+            - test.txt
        
   two:
     docker:
       - image: circleci/ruby:2.4.1
     steps:
-      - run: echo "A more familiar hi"  
+      - run: echo "A more familiar hi" 
+      - restore_cache:
+          key: my-cache-123
+      - run: cat test.txt
 workflows:
   version: 2
   one_and_two:
